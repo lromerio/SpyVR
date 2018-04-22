@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class ControllerGrabObject : MonoBehaviour {
 
+	// Private attributes
     private SteamVR_TrackedObject trackedObj;
-
     private GameObject collidingObject;
     private GameObject touchingObject;
- 
     private GameObject objectInHand;
 
     private SteamVR_Controller.Device Controller
@@ -21,31 +20,27 @@ public class ControllerGrabObject : MonoBehaviour {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
     }
 
+
     private void SetCollidingObject(Collider col)
     {
-        // 1
         if (collidingObject || !col.GetComponent<Rigidbody>())
         {
             touchingObject = col.gameObject;
             return;
         }
-        // 2
         collidingObject = col.gameObject;
     }
 
-    // 1
     public void OnTriggerEnter(Collider other)
     {
         SetCollidingObject(other);
     }
 
-    // 2
     public void OnTriggerStay(Collider other)
     {
         SetCollidingObject(other);
     }
 
-    // 3
     public void OnTriggerExit(Collider other)
     {
         if (!collidingObject)
@@ -60,19 +55,21 @@ public class ControllerGrabObject : MonoBehaviour {
     {
         if(collidingObject.tag == "InventoryItem")
         {
+			// Extract object from inventory
             collidingObject = collidingObject.GetComponentInParent<Inventory>().TakeObject(collidingObject);
             collidingObject.transform.position = transform.position;
         }
+        
+        // Grab object
         objectInHand = collidingObject;
         collidingObject = null;
-        // 2
         var joint = AddFixedJoint();
         joint.connectedBody = objectInHand.GetComponent<Rigidbody>();
     }
 
-    // 3
     private FixedJoint AddFixedJoint()
     {
+		// Add fixed joint to emulate phisics of grab
         FixedJoint fx = gameObject.AddComponent<FixedJoint>();
         fx.breakForce = 20000;
         fx.breakTorque = 20000;
@@ -81,22 +78,24 @@ public class ControllerGrabObject : MonoBehaviour {
 
     public void ReleaseObject()
     {
-        // 1
         if (GetComponent<FixedJoint>())
         {
-            // 2
+			// Remove fixed point
             GetComponent<FixedJoint>().connectedBody = null;
             Destroy(GetComponent<FixedJoint>());
-            // 3
+
+			// Allow to throw objects
             objectInHand.GetComponent<Rigidbody>().velocity = Controller.velocity;
             objectInHand.GetComponent<Rigidbody>().angularVelocity = Controller.angularVelocity;
         }
-        // 4
+        
         if(touchingObject && touchingObject.GetComponent<Inventory>())
         {
+			// Insert object in the inventory
             touchingObject.GetComponent<Inventory>().PutObject(objectInHand);
             Destroy(objectInHand);
         }
+        
         objectInHand = null;
     }
 
@@ -110,7 +109,6 @@ public class ControllerGrabObject : MonoBehaviour {
             }
         }
 
-        // 2
         if (Controller.GetHairTriggerUp())
         {
             if (objectInHand)
