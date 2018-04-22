@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour {
 
-    private SteamVR_TrackedObject trackedObj;
 
-    public List<GameObject> inventory;
+	// Public attributes
     [HideInInspector]
     public bool shown = false;
-
-    private List<GameObject> shownInstances = new List<GameObject>();
-    private Dictionary<GameObject, GameObject> shownToInv;
-
     public float radius;
     public float max_angle;
     public float obj_scale;
+	public List<GameObject> inventory;
+    
+	// Private attributes
+    private List<GameObject> shownInstances = new List<GameObject>();
+    private Dictionary<GameObject, GameObject> shownToInv;
+    private SteamVR_TrackedObject trackedObj;
 
     private SteamVR_Controller.Device Controller
     {
@@ -88,12 +89,10 @@ public class Inventory : MonoBehaviour {
         shown = false;
     }
 
-    // Use this for initialization
     void Start () {
-		
+		// TODO initiallization goes here
 	}
 	
-	// Update is called once per frame
 	void Update () {
         if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
