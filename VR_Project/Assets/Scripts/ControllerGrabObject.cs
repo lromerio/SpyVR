@@ -7,7 +7,7 @@ public class ControllerGrabObject : MonoBehaviour {
 	// Private attributes
     private SteamVR_TrackedObject trackedObj;
     private GameObject collidingObject;
-    private GameObject touchingObject;
+    public GameObject inventoryController;
     private GameObject objectInHand;
 
     private SteamVR_Controller.Device Controller
@@ -23,9 +23,12 @@ public class ControllerGrabObject : MonoBehaviour {
 
     private void SetCollidingObject(Collider col)
     {
+        if (col.gameObject.GetComponent<Inventory>())
+        {
+            inventoryController = col.gameObject;
+        }
         if (collidingObject || !col.GetComponent<Rigidbody>())
         {
-            touchingObject = col.gameObject;
             return;
         }
         collidingObject = col.gameObject;
@@ -47,7 +50,10 @@ public class ControllerGrabObject : MonoBehaviour {
         {
             return;
         }
-        touchingObject = null;
+        if (other.gameObject.GetComponent<Inventory>())
+        {
+            inventoryController = null;
+        }
         collidingObject = null;
     }
 
@@ -61,10 +67,13 @@ public class ControllerGrabObject : MonoBehaviour {
         }
         
         // Grab object
-        objectInHand = collidingObject;
-        collidingObject = null;
-        var joint = AddFixedJoint();
-        joint.connectedBody = objectInHand.GetComponent<Rigidbody>();
+        if(collidingObject && (collidingObject.CompareTag("Grabable") || collidingObject.CompareTag("Storable")))
+        {     
+            objectInHand = collidingObject;
+            var joint = AddFixedJoint();
+            joint.connectedBody = objectInHand.GetComponent<Rigidbody>();
+            collidingObject = null;
+        }
     }
 
     private FixedJoint AddFixedJoint()
@@ -89,13 +98,13 @@ public class ControllerGrabObject : MonoBehaviour {
             objectInHand.GetComponent<Rigidbody>().angularVelocity = Controller.angularVelocity;
         }
         
-        if(touchingObject && touchingObject.GetComponent<Inventory>())
+        if(inventoryController && objectInHand.CompareTag("Storable"))
         {
-			// Insert object in the inventory
-            touchingObject.GetComponent<Inventory>().PutObject(objectInHand);
+            // Insert object in the inventory
+            inventoryController.GetComponent<Inventory>().PutObject(objectInHand);
             Destroy(objectInHand);
         }
-        
+
         objectInHand = null;
     }
 
