@@ -42,6 +42,7 @@ public class Inventory : MonoBehaviour {
         {
             GameObject prefab = inventory[i];
             GameObject inst = Instantiate(prefab,this.transform);
+            inst.SetActive(true);
             shownToInv.Add(inst, prefab);
 
             shownInstances.Add(inst);
@@ -65,16 +66,21 @@ public class Inventory : MonoBehaviour {
     {
         shownInstances.Remove(item);
         var invItem = shownToInv[item];
-        var obj = Instantiate(invItem);
+        print(invItem);
+        print("Removed");
+        GameObject obj = Instantiate(invItem) as GameObject;
         inventory.Remove(invItem);
         Destroy(item);
+        obj.SetActive(true);
         return obj;
     }
 
     public void PutObject(GameObject obj)
     {
         HideInventory();
-        inventory.Add(Instantiate(obj));
+        GameObject foo = Instantiate(obj) as GameObject;
+        inventory.Add(foo);
+        foo.SetActive(false);
         ShowInventory();
     }
 
