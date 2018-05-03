@@ -1,4 +1,4 @@
-# Asymetrical VR escape room like game
+# Asymmetrical VR escape room like game
 
 ## Description
 An asymmetrical, escape room like, VR game done with unity.
