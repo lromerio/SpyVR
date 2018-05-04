@@ -12,13 +12,13 @@ Improve current in game functionalities
 
 Object | Characteristic | Interactions
 --- | --- | ---
-Computer | Unique ID shown on it, tag corresponds to it | Can be hacked
+Computer | Unique ID shown on it | Can be hacked
 Elevator | | Go up and down (change room)
 Alarm | Different cables | Cutting cables
 Cutting object | Can be inserted in the inventory | Used to cut cables
 Key | Can be inserted in the inventory | Used to open one or more doors
 Door 1 | | Can be opened/closed by the VR player
-Door 2 | Unique ID, tag correpsonds to it | Can be hacked (open/close)
+Door 2 | Unique ID visible | Can be hacked (open/close)
 Door 3 | | Can be opened with the correct key
 Guard | Human like or webcam | If VR player is seen from it: game over
 Printer | On/Off button and states | VR player can turn it On/Off
