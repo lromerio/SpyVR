@@ -23,7 +23,7 @@ Door 3 | | Can be opened with the correct key
 Guard | Human like or webcam | If VR player is seen from it: game over
 Printer | On/Off button and states | VR player can turn it On/Off
 Hidding Object | | Has to be displaced in order to see the symbol on the floor
-Light | Unique ID, tag corrresponds to it | Can be hacked (on/off)
+Light | Unique ID | Can be hacked (on/off)
 Floor symbol | Only visible when  lights are off |
 Poster | Maps symbols to numbers | Can be inserted in the inventory
 Paper | Lights IDs specified on it (Level 3) | Can be inserted in the inventory
