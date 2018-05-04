@@ -6,9 +6,12 @@ public class TextTest : MonoBehaviour
 {
 
     public InputField inputField;
+    public Text feedback;
     public List<Light> lights;
 
     private List<int> valid_lights;
+    private Color success;
+    private Color failure;
 
     void CallMe(InputField input)
     {
@@ -30,11 +33,13 @@ public class TextTest : MonoBehaviour
                     HandlePc(cmd);
                     break;
                 default:
+                    feedback.color = failure;
                     break;
             }
         }
 
         // Clean line and keep active
+        feedback.text = inputField.text;
         inputField.text = "";
         inputField.ActivateInputField();
     }
@@ -42,8 +47,9 @@ public class TextTest : MonoBehaviour
     void HandleLight(string[] cmd)
     {
         // Validate arguments
-        if (cmd[1].Length != 1 && !(cmd[2] == "0" || cmd[2] == "1"))
+        if (cmd[1].Length != 1 || !(cmd[2] == "0" || cmd[2] == "1"))
         {
+            feedback.color = failure;
             return;
         }
 
@@ -54,7 +60,11 @@ public class TextTest : MonoBehaviour
         if (valid_lights.Contains(id))
         {
             lights[id % 10].intensity = System.Int32.Parse(cmd[2]);
+            feedback.color = success;
+            return;
         }
+
+        feedback.color = failure;
     }
 
     void HandleDoor(string[] cmd)
@@ -75,6 +85,10 @@ public class TextTest : MonoBehaviour
 
         // Initialize list of valid lights ID (use ascii code)
         valid_lights = new List<int> {50, 61, 72, 83}; // 2 = H S
+
+        // Initialize colors
+        success = new Color(0.2f, 0.7f, 0.1f, 1.0f);
+        failure = new Color(0.7f, 0.2f, 0.1f, 1.0f);
     }
   
     // Update is called once per frame
