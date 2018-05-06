@@ -11,10 +11,6 @@ public class TextTest : MonoBehaviour
     private Color success;
     private Color failure;
 
-    // Lights
-    public List<Light> lights;
-    private List<int> valid_lights;
-
     // Command history
     private bool up; 
     private bool down;
@@ -59,24 +55,25 @@ public class TextTest : MonoBehaviour
 
     void HandleLight(string[] cmd)
     {
-        // Validate arguments
-        if (cmd[1].Length != 1 || !(cmd[2] == "0" || cmd[2] == "1"))
+        // Try to get light
+        Light l = null;
+        try
         {
-            feedback.color = failure;
-            return;
+            l = GameObject.Find(cmd[1]).GetComponent<Light>();
+        }
+        catch
+        {
+            // Do nothing
         }
 
-        // Get light ID
-        int id = (int)cmd[1][0];
-
-        // If valid ID modify light intensity
-        if (valid_lights.Contains(id))
+        // If valid light and command, execute it
+        if (l != null && (cmd[2] == "off" || cmd[2] == "on"))
         {
-            lights[id % 10].intensity = System.Int32.Parse(cmd[2]);
+            l.enabled = cmd[2] == "on";
             feedback.color = success;
             return;
         }
-
+        
         feedback.color = failure;
     }
 
@@ -104,9 +101,6 @@ public class TextTest : MonoBehaviour
     {
         // Add listener
         inputField.onEndEdit.AddListener(delegate { CallMe();});
-
-        // Initialize list of valid lights ID (use ascii code)
-        valid_lights = new List<int> {50, 61, 72, 83}; // 2 = H S
 
         // Initialize colors
         success = new Color(0.2f, 0.7f, 0.1f, 1.0f);
