@@ -17,6 +17,8 @@ public class TextTest : MonoBehaviour
     private List<string> cmd_history;
     private int history_index;
 
+    // Paper
+    public GameObject paper;
 
     void CallMe()
     {
@@ -84,7 +86,9 @@ public class TextTest : MonoBehaviour
 
     void HandlePc(string[] cmd)
     {
+        paper.SetActive(true);
 
+        feedback.color = success;
     }
 
     void UpdateCurrentCmd(int x)
@@ -111,6 +115,8 @@ public class TextTest : MonoBehaviour
         down = false;
         cmd_history = new List<string>();
         history_index = 0;
+
+        paper.SetActive(false);
     }
 
     void Update()
