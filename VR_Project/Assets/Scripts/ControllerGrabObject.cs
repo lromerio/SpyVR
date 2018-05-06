@@ -9,6 +9,14 @@ public class ControllerGrabObject : MonoBehaviour {
     private GameObject collidingObject;
     public GameObject inventoryController;
     private GameObject objectInHand;
+    public GameObject pliersModel;
+    public GameObject controllerModel;
+    enum ControllerState {
+        GRABNMOVE,
+        PLIER
+    }
+
+    ControllerState state;
 
     private SteamVR_Controller.Device Controller
     {
@@ -17,6 +25,7 @@ public class ControllerGrabObject : MonoBehaviour {
 
     void Awake()
     {
+        pliersModel.SetActive(false);
         trackedObj = GetComponent<SteamVR_TrackedObject>();
     }
 
@@ -101,8 +110,8 @@ public class ControllerGrabObject : MonoBehaviour {
         if(inventoryController && objectInHand.CompareTag("Storable"))
         {
             // Insert object in the inventory
-            inventoryController.GetComponent<Inventory>().PutObject(objectInHand);
-            Destroy(objectInHand);
+            if(inventoryController.GetComponent<Inventory>().PutObject(objectInHand))
+                Destroy(objectInHand);
         }
 
         objectInHand = null;
@@ -118,10 +127,26 @@ public class ControllerGrabObject : MonoBehaviour {
             }
         }
 
-        if(objectInHand && objectInHand.GetComponent<Pliers>())
+        if (state == ControllerState.PLIER)
         {
             float val = Controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
-            objectInHand.GetComponent<Pliers>().set_closed_value(val);
+            pliersModel.GetComponent<Pliers>().set_closed_value(val);
+        }
+
+        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu)){
+            switch(state)
+            {
+                case ControllerState.GRABNMOVE:
+                    pliersModel.SetActive(true);
+                    controllerModel.SetActive(false);
+                    state = ControllerState.PLIER;
+                    break;
+                case ControllerState.PLIER:
+                    pliersModel.SetActive(false);
+                    controllerModel.SetActive(true);
+                    state = ControllerState.GRABNMOVE;
+                    break;
+            }
         }
 
         if (Controller.GetHairTriggerUp())
