@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI; 
 
 public class TextTest : MonoBehaviour
 {
@@ -80,9 +80,54 @@ public class TextTest : MonoBehaviour
         feedback.color = failure;
     }
 
-    void HandleDoor(string[] cmd)
-    {
+	public bool moving = false;
+	IEnumerator<int> MoveFromTo(GameObject door, Vector3 pointA, Vector3 pointB, float time){
+		if (!moving){ // do nothing if already moving
+			moving = true; // signals "I'm moving, don't bother me!"
+			float t = 0f;
+			while (t < 1f){
+				t += Time.deltaTime / time; // sweeps from 0 to 1 in time seconds
+				door.transform.position = Vector3.Lerp(pointA, pointB, t); // set position proportional to t
+				yield return 0; // leave the routine and return here in the next frame
+			}
+			moving = false; // finished moving
+		}
+	}
 
+	void HandleDoor(string[] cmd)
+    {
+		// Try to get door
+		GameObject d = null;
+		try
+		{
+			d = GameObject.Find(cmd[1]);
+		}
+		catch
+		{
+			// Do nothing
+		}
+
+		// If valid light and command, execute it
+		if (d != null)
+		{
+			Vector3 old_pos = d.transform.position;
+
+			if (cmd [2] == "open" && d.transform.position.y <= 0) {
+				Vector3 new_pos = new Vector3 (old_pos.x, 1.7f, old_pos.z);
+				StartCoroutine(MoveFromTo(d, old_pos, new_pos, 5f));
+				feedback.color = success;
+				return;
+			}
+
+			if (cmd [2] == "close" && d.transform.position.y >= 1.7f) {
+				Vector3 new_pos = new Vector3 (old_pos.x, 0f, old_pos.z);
+				StartCoroutine(MoveFromTo(d, old_pos, new_pos, 5f));
+				feedback.color = success;
+				return;
+			}
+		}
+
+		feedback.color = failure;
     }
 
     void HandlePc(string[] cmd)
