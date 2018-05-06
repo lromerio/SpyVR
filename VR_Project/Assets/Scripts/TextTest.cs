@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TextTest : MonoBehaviour
 {
     // Input field
-    public InputField inputField;
-    public Text feedback;
+	public InputField inputField;
+	public Text feedback;
     private Color success;
     private Color failure;
+
+	// Hidden symbols
+	public TextMesh dark_text;
 
     // Command history
     private bool up; 
@@ -71,7 +75,9 @@ public class TextTest : MonoBehaviour
         {
             l.enabled = cmd[2] == "on";
             feedback.color = success;
-            return;
+
+			dark_text.gameObject.SetActive(!FindObjectsOfType<Light>().Any(c => c.enabled));
+			return;
         }
         
         feedback.color = failure;
@@ -139,6 +145,9 @@ public class TextTest : MonoBehaviour
         down = false;
         cmd_history = new List<string>();
         history_index = 0;
+
+		// Initialize text
+		dark_text.gameObject.SetActive(false);
     }
 
     void Update()
