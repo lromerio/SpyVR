@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.UI;
 
 public class TextTest : MonoBehaviour
 {
@@ -77,27 +77,13 @@ public class TextTest : MonoBehaviour
         feedback.color = failure;
     }
 
-	public bool moving = false;
-	IEnumerator<int> MoveFromTo(GameObject door, Vector3 pointA, Vector3 pointB, float time){
-		if (!moving){ // do nothing if already moving
-			moving = true; // signals "I'm moving, don't bother me!"
-			float t = 0f;
-			while (t < 1f){
-				t += Time.deltaTime / time; // sweeps from 0 to 1 in time seconds
-				door.transform.position = Vector3.Lerp(pointA, pointB, t); // set position proportional to t
-				yield return 0; // leave the routine and return here in the next frame
-			}
-			moving = false; // finished moving
-		}
-	}
-
 	void HandleDoor(string[] cmd)
     {
 		// Try to get door
-		GameObject d = null;
+		GameObject obj = null;
 		try
 		{
-			d = GameObject.Find(cmd[1]);
+			obj = GameObject.Find(cmd[1]);
 		}
 		catch
 		{
@@ -105,20 +91,17 @@ public class TextTest : MonoBehaviour
 		}
 
 		// If valid light and command, execute it
-		if (d != null)
+		if (obj != null)
 		{
-			Vector3 old_pos = d.transform.position;
-
-			if (cmd [2] == "open" && d.transform.position.y <= 0) {
-				Vector3 new_pos = new Vector3 (old_pos.x, 1.7f, old_pos.z);
-				StartCoroutine(MoveFromTo(d, old_pos, new_pos, 5f));
+			Door door = obj.GetComponent<Door> (); 
+			if (cmd [2] == "open") {
+				door.move_y(1.7f * 0.4f);
 				feedback.color = success;
 				return;
 			}
 
-			if (cmd [2] == "close" && d.transform.position.y >= 1.7f) {
-				Vector3 new_pos = new Vector3 (old_pos.x, 0f, old_pos.z);
-				StartCoroutine(MoveFromTo(d, old_pos, new_pos, 5f));
+			if (cmd [2] == "close") {
+				door.move_y(0.1857729f * 0.4f);
 				feedback.color = success;
 				return;
 			}
