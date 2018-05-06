@@ -95,13 +95,13 @@ public class TextTest : MonoBehaviour
 		{
 			Door door = obj.GetComponent<Door> (); 
 			if (cmd [2] == "open") {
-				door.move_y(1.7f * 0.4f);
+				door.move_y(1.7f * door.transform.localScale.y);
 				feedback.color = success;
 				return;
 			}
 
 			if (cmd [2] == "close") {
-				door.move_y(0.1857729f * 0.4f);
+				door.move_y(0.1857729f * door.transform.localScale.y);
 				feedback.color = success;
 				return;
 			}

@@ -8,8 +8,6 @@ public class Door : MonoBehaviour {
 	public Transform door;
 
 	IEnumerator<int> MoveFromTo(Vector3 pointA, Vector3 pointB, float time){
-		print(pointA);
-		print(pointB);
 		if (!moving){ // do nothing if already moving
 			moving = true; // signals "I'm moving, don't bother me!"
 			float t = 0f;
