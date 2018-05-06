@@ -75,13 +75,15 @@ public class Inventory : MonoBehaviour {
         return obj;
     }
 
-    public void PutObject(GameObject obj)
+    public bool PutObject(GameObject obj)
     {
+        if (!shown) return false;
         HideInventory();
         GameObject foo = Instantiate(obj) as GameObject;
         inventory.Add(foo);
         foo.SetActive(false);
         ShowInventory();
+        return true;
     }
 
     void HideInventory()
