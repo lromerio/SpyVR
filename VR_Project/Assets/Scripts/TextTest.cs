@@ -150,12 +150,9 @@ public class TextTest : MonoBehaviour
         cmd_history = new List<string>();
         history_index = 0;
 
-<<<<<<< HEAD
 		// Initialize text
 		dark_text.gameObject.SetActive(false);
-=======
         paper.SetActive(false);
->>>>>>> theMerge
     }
 
     void Update()
