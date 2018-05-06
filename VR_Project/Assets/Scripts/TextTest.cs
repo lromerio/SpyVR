@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TextTest : MonoBehaviour
 {
     // Input field
-    public InputField inputField;
-    public Text feedback;
+	public InputField inputField;
+	public Text feedback;
     private Color success;
     private Color failure;
+
+	// Hidden symbols
+	public TextMesh dark_text;
 
     // Command history
     private bool up; 
@@ -17,6 +21,8 @@ public class TextTest : MonoBehaviour
     private List<string> cmd_history;
     private int history_index;
 
+    // Paper
+    public GameObject paper;
 
     void CallMe()
     {
@@ -71,20 +77,52 @@ public class TextTest : MonoBehaviour
         {
             l.enabled = cmd[2] == "on";
             feedback.color = success;
-            return;
+
+			dark_text.gameObject.SetActive(!FindObjectsOfType<Light>().Any(c => c.enabled));
+			return;
         }
         
         feedback.color = failure;
     }
 
-    void HandleDoor(string[] cmd)
+	void HandleDoor(string[] cmd)
     {
+		// Try to get door
+		GameObject obj = null;
+		try
+		{
+			obj = GameObject.Find(cmd[1]);
+		}
+		catch
+		{
+			// Do nothing
+		}
 
+		// If valid light and command, execute it
+		if (obj != null)
+		{
+			Door door = obj.GetComponent<Door> (); 
+			if (cmd [2] == "open") {
+				door.move_y(1.7f * door.transform.localScale.y);
+				feedback.color = success;
+				return;
+			}
+
+			if (cmd [2] == "close") {
+				door.move_y(0.1857729f * door.transform.localScale.y);
+				feedback.color = success;
+				return;
+			}
+		}
+
+		feedback.color = failure;
     }
 
     void HandlePc(string[] cmd)
     {
+        paper.SetActive(true);
 
+        feedback.color = success;
     }
 
     void UpdateCurrentCmd(int x)
@@ -111,6 +149,10 @@ public class TextTest : MonoBehaviour
         down = false;
         cmd_history = new List<string>();
         history_index = 0;
+
+		// Initialize text
+		dark_text.gameObject.SetActive(false);
+        paper.SetActive(false);
     }
 
     void Update()
