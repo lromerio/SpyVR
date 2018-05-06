@@ -60,7 +60,7 @@ public class LaserPointer : MonoBehaviour {
     }
     
     void Update () {
-        if (Controller.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
+        if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip))
         {
 			
 			// Update laser position
@@ -82,7 +82,7 @@ public class LaserPointer : MonoBehaviour {
             reticle.SetActive(false);
         }
 
-        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad) && shouldTeleport)
+        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Grip) && shouldTeleport)
         {
 			// Teleport
             Teleport();

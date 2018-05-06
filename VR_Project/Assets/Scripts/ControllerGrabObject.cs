@@ -118,6 +118,12 @@ public class ControllerGrabObject : MonoBehaviour {
             }
         }
 
+        if(objectInHand && objectInHand.GetComponent<Pliers>())
+        {
+            float val = Controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
+            objectInHand.GetComponent<Pliers>().set_closed_value(val);
+        }
+
         if (Controller.GetHairTriggerUp())
         {
             if (objectInHand)
