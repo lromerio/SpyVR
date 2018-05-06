@@ -535,7 +535,7 @@ namespace Valve.VR.InteractionSystem
 
 			foreach ( T value in source )
 			{
-				action( value );
+				action.action( value );
 			}
 		}
 
