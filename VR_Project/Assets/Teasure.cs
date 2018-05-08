@@ -3,8 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Teasure : MonoBehaviour {
-	private MeshCollider mc;
 	public Transform key;
+
+	private void OnTriggerEnter(Collider c) {
+		if (c.gameObject.name == "KeyGold")
+		{
+			Debug.Log("collision");
+			GetComponent<Animation> ().Play("box_open");
+		}
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -12,9 +19,5 @@ public class Teasure : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		print (gameObject.name);
-		if (mc && mc.isTrigger && gameObject.name == "KeyGold") {
-			GetComponent<Animator> ().Play("box_open");
-		}
 	}
 }

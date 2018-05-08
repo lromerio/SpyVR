@@ -17,7 +17,18 @@ ModelImporter:
     7400000: box_open
     7400002: box_close
     9500000: //RootNode
-  externalObjects: {}
+    11100000: //RootNode
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: box_01
+    second: {fileID: 2100000, guid: 97d70fed0b8e1a74d8665e00b50bf7c7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert3
+    second: {fileID: 2100000, guid: 273dfab5801e17e4fb4b599c2cb1b816, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
@@ -147,7 +158,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 1
   humanoidOversampling: 1
   additionalBone: 1
   userData: 
