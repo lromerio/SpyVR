@@ -49,9 +49,27 @@ public class Inventory : MonoBehaviour {
 
             inst.GetComponent<Rigidbody>().isKinematic = true;
             inst.GetComponent<Rigidbody>().useGravity = false;
+            inst.layer = LayerMask.NameToLayer("Inventory Items");
+            //inst.GetComponent<Rigidbody>(). = false;
+
+
+            //Experimental
+            Material m = inst.GetComponent<Renderer>().material;
+            m.SetOverrideTag("RenderType", "Opaque");
+            m.SetFloat("_Mode", 3);
+            m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+            m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            m.SetInt("_ZWrite", 0);
+            m.DisableKeyword("_ALPHATEST_ON");
+            m.EnableKeyword("_ALPHABLEND_ON");
+            m.DisableKeyword("_APLHAPREMULTIPLY_ON");
+            m.renderQueue = 3000;
+            Color c = m.color;
+            c.a = 0.1f;
+            inst.GetComponent<Renderer>().material.color = c;
 
             inst.transform.position = transform.position;
-            inst.transform.localScale *= obj_scale;
+            inst.transform.localScale *= obj_scale / inst.GetComponent<Renderer>().bounds.size.magnitude;
             inst.tag = "InventoryItem";
 
             float instAngle = Mathf.Lerp(-angle, angle, i / (float)(inventory.Count)) + Mathf.PI/2;

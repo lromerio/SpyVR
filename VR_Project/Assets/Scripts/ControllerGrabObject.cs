@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class ControllerGrabObject : MonoBehaviour {
 
 	// Private attributes
@@ -11,6 +12,9 @@ public class ControllerGrabObject : MonoBehaviour {
     private GameObject objectInHand;
     public GameObject pliersModel;
     public GameObject controllerModel;
+    public Color hightlightColor;
+    public float grabDistance;
+    private Color black = new Color(0, 0, 0, 1);
     enum ControllerState {
         GRABNMOVE,
         PLIER
@@ -29,21 +33,32 @@ public class ControllerGrabObject : MonoBehaviour {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
     }
 
+    bool interactive(GameObject obj)
+    {
+        return obj.CompareTag("Grabable") || obj.CompareTag("Storable") || obj.CompareTag("InventoryItem");
+    }
 
     private void SetCollidingObject(Collider col)
     {
+        
+
         if (col.gameObject.GetComponent<Inventory>())
         {
             inventoryController = col.gameObject;
         }
-        if (collidingObject || !col.GetComponent<Rigidbody>())
+        if (interactive(col.gameObject))
         {
-            return;
+            hightlight(col.gameObject);
+            if(col.gameObject != collidingObject) //If new object hovered
+            {
+                //Vibrate
+                Controller.TriggerHapticPulse(3999);
+            }
+            collidingObject = col.gameObject;
         }
-        collidingObject = col.gameObject;
     }
 
-    public void OnTriggerEnter(Collider other)
+    /*public void OnTriggerEnter(Collider other)
     {
         SetCollidingObject(other);
     }
@@ -63,8 +78,10 @@ public class ControllerGrabObject : MonoBehaviour {
         {
             inventoryController = null;
         }
+        Renderer r = collidingObject.GetComponent<Renderer>();
+        if (r) r.material.SetColor("_EmissionColor", black);
         collidingObject = null;
-    }
+    }*/
 
     private void GrabObject()
     {
@@ -85,22 +102,31 @@ public class ControllerGrabObject : MonoBehaviour {
         }
     }
 
-    private FixedJoint AddFixedJoint()
+
+    private ConfigurableJoint AddFixedJoint()
     {
-		// Add fixed joint to emulate phisics of grab
-        FixedJoint fx = gameObject.AddComponent<FixedJoint>();
-        fx.breakForce = 20000;
-        fx.breakTorque = 20000;
+        // Add fixed joint to emulate phisics of grab
+        ConfigurableJoint fx = gameObject.AddComponent<ConfigurableJoint>();
+        fx.breakForce = 30000;
+        fx.breakTorque = 30000;
+        fx.xMotion = ConfigurableJointMotion.Limited;
+        fx.yMotion = ConfigurableJointMotion.Limited;
+        fx.zMotion = ConfigurableJointMotion.Limited;
+        fx.angularXMotion = ConfigurableJointMotion.Limited;
+        fx.angularYMotion = ConfigurableJointMotion.Limited;
+        fx.angularZMotion = ConfigurableJointMotion.Limited;
+        fx.linearLimitSpring = new SoftJointLimitSpring{spring=10000f,damper=1f};
+        fx.linearLimit = new SoftJointLimit {limit=0.0f,bounciness=0f,contactDistance=0};
         return fx;
     }
 
     public void ReleaseObject()
     {
-        if (GetComponent<FixedJoint>())
+        if (GetComponent<ConfigurableJoint>())
         {
 			// Remove fixed point
-            GetComponent<FixedJoint>().connectedBody = null;
-            Destroy(GetComponent<FixedJoint>());
+            GetComponent<ConfigurableJoint>().connectedBody = null;
+            Destroy(GetComponent<ConfigurableJoint>());
 
 			// Allow to throw objects
             objectInHand.GetComponent<Rigidbody>().velocity = Controller.velocity;
@@ -110,11 +136,18 @@ public class ControllerGrabObject : MonoBehaviour {
         if(inventoryController && objectInHand.CompareTag("Storable"))
         {
             // Insert object in the inventory
+            hightlight(objectInHand, false);
             if(inventoryController.GetComponent<Inventory>().PutObject(objectInHand))
                 Destroy(objectInHand);
         }
 
         objectInHand = null;
+    }
+
+    void hightlight(GameObject obj, bool high = true)
+    {
+        Renderer r = obj.GetComponent<Renderer>();
+        if (r) r.material.SetColor("_EmissionColor", high ? hightlightColor : black);
     }
 
     // Update is called once per frame
@@ -125,6 +158,22 @@ public class ControllerGrabObject : MonoBehaviour {
             {
                 GrabObject();
             }
+        }
+
+        //Cast a ray
+        RaycastHit hit;
+        if(Physics.Raycast(transform.position,transform.forward,out hit,grabDistance) && state == ControllerState.GRABNMOVE)
+        {
+            if (hit.collider.gameObject != collidingObject && collidingObject)
+                hightlight(collidingObject, false);
+
+            SetCollidingObject(hit.collider);
+        }
+        else if(collidingObject)
+        {
+            hightlight(collidingObject, false);
+            collidingObject = null;
+            inventoryController = null;
         }
 
         if (state == ControllerState.PLIER)
