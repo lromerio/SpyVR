@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Curve;
+using Tubular;
 
 
 public class ControllerGrabObject : MonoBehaviour {
@@ -12,6 +14,7 @@ public class ControllerGrabObject : MonoBehaviour {
     private GameObject objectInHand;
     public GameObject pliersModel;
     public GameObject controllerModel;
+    public GameObject sparks;
     public Color hightlightColor;
     public float grabDistance;
     private Color black = new Color(0, 0, 0, 1);
@@ -31,6 +34,7 @@ public class ControllerGrabObject : MonoBehaviour {
     {
         pliersModel.SetActive(false);
         trackedObj = GetComponent<SteamVR_TrackedObject>();
+        GenerateTube();
     }
 
     bool interactive(GameObject obj)
@@ -58,63 +62,71 @@ public class ControllerGrabObject : MonoBehaviour {
         }
     }
 
-    /*public void OnTriggerEnter(Collider other)
-    {
-        SetCollidingObject(other);
-    }
+	private void vibrate(float intensity) {
+		Controller.TriggerHapticPulse((ushort)(2000f*intensity));
+	}
 
-    public void OnTriggerStay(Collider other)
+    private void GenerateTube()
     {
-        SetCollidingObject(other);
-    }
+        var controls = new List<Vector3>() {
+            new Vector3(0, 0, 0),
+            new Vector3(0, 0, grabDistance)
+        };
+        var curve = new CatmullRomCurve(controls);
 
-    public void OnTriggerExit(Collider other)
-    {
-        if (!collidingObject)
-        {
-            return;
-        }
-        if (other.gameObject.GetComponent<Inventory>())
-        {
-            inventoryController = null;
-        }
-        Renderer r = collidingObject.GetComponent<Renderer>();
-        if (r) r.material.SetColor("_EmissionColor", black);
-        collidingObject = null;
-    }*/
+        // Build tubular mesh with Curve
+        int tubularSegments = 40;
+        float radius = 0.001f;
+        int radialSegments = 20;
+        bool closed = false; // closed curve or not
+        var mesh = Tubular.Tubular.Build(curve, tubularSegments, radius, radialSegments, closed);
+
+        // visualize mesh
+        var filter = GetComponent<MeshFilter>();
+        filter.sharedMesh = mesh;
+    }
 
     private void GrabObject()
     {
         if(collidingObject.tag == "InventoryItem")
         {
 			// Extract object from inventory
+			Vector3 oldpos = collidingObject.transform.position;
             collidingObject = collidingObject.GetComponentInParent<Inventory>().TakeObject(collidingObject);
-            collidingObject.transform.position = transform.position;
+			collidingObject.transform.position = oldpos;
         }
         
         // Grab object
         if(collidingObject && (collidingObject.CompareTag("Grabable") || collidingObject.CompareTag("Storable")))
         {     
             objectInHand = collidingObject;
-            var joint = AddFixedJoint();
+
+			bool alreadyContrained = objectInHand.GetComponent<Joint> () != null;
+
+			var joint = AddFixedJoint(alreadyContrained);
+			if(!alreadyContrained) StartCoroutine (MoveObjectToGrab (joint,objectInHand));
             joint.connectedBody = objectInHand.GetComponent<Rigidbody>();
             collidingObject = null;
         }
     }
 
 
-    private ConfigurableJoint AddFixedJoint()
+	private ConfigurableJoint AddFixedJoint(bool dontMessAnchor)
     {
         // Add fixed joint to emulate phisics of grab
         ConfigurableJoint fx = gameObject.AddComponent<ConfigurableJoint>();
         fx.breakForce = 30000;
         fx.breakTorque = 30000;
+		if (!dontMessAnchor) {
+			fx.autoConfigureConnectedAnchor = false;
+			fx.connectedAnchor = new Vector3 (0, 0, 0);
+		}
         fx.xMotion = ConfigurableJointMotion.Limited;
         fx.yMotion = ConfigurableJointMotion.Limited;
         fx.zMotion = ConfigurableJointMotion.Limited;
-        fx.angularXMotion = ConfigurableJointMotion.Limited;
-        fx.angularYMotion = ConfigurableJointMotion.Limited;
-        fx.angularZMotion = ConfigurableJointMotion.Limited;
+		fx.angularXMotion = ConfigurableJointMotion.Limited;
+		fx.angularYMotion = ConfigurableJointMotion.Limited;
+		fx.angularZMotion = ConfigurableJointMotion.Limited;
         fx.linearLimitSpring = new SoftJointLimitSpring{spring=10000f,damper=1f};
         fx.linearLimit = new SoftJointLimit {limit=0.0f,bounciness=0f,contactDistance=0};
         return fx;
@@ -150,6 +162,38 @@ public class ControllerGrabObject : MonoBehaviour {
         if (r) r.material.SetColor("_EmissionColor", high ? hightlightColor : black);
     }
 
+	void moveSparkAt(Vector3 position, Vector3 normal, Vector3 ray)
+    {
+		sparks.transform.position = position+0.0001f*normal;
+		Vector3 dir = Vector3.Reflect (ray, normal);
+		sparks.transform.forward = dir;
+		sparks.SetActive (true);
+    }
+
+	IEnumerator<int> MoveObjectToGrab(ConfigurableJoint joint, GameObject obj){
+		float t = 0f;
+		float maxt = 0.3f;
+		Vector3 startPos = transform.InverseTransformPoint(obj.transform.position);
+		/*PreferedRotation rot = obj.GetComponent<PreferedRotation> ();
+		if (rot) {
+			Vector3 startRot = obj.transform.eulerAngles;
+			while (t < maxt) {
+				float factor = t / maxt;
+				joint.targetRotation = Quaternion.Euler(Vector3.Lerp (startRot, rot.preferedRotation, factor));
+				joint.anchor = Vector3.Lerp (startPos, new Vector3 (0, 0, 1) * grabDistance, factor);
+				t += Time.deltaTime;
+				yield return 0; // leave the routine and return here in the next frame
+			}
+		} else {*/
+			while (t < maxt) {
+				float factor = t / maxt;
+				joint.anchor = Vector3.Lerp (startPos, new Vector3 (0, 0, 1) * grabDistance, factor);
+				t += Time.deltaTime;
+				yield return 0; // leave the routine and return here in the next frame
+			}
+		//}
+	}
+
     // Update is called once per frame
     void Update () {
         if (Controller.GetHairTriggerDown())
@@ -162,19 +206,22 @@ public class ControllerGrabObject : MonoBehaviour {
 
         //Cast a ray
         RaycastHit hit;
-        if(Physics.Raycast(transform.position,transform.forward,out hit,grabDistance) && state == ControllerState.GRABNMOVE)
-        {
-            if (hit.collider.gameObject != collidingObject && collidingObject)
-                hightlight(collidingObject, false);
+		if (Physics.Raycast (transform.position, transform.forward, out hit, grabDistance) && state == ControllerState.GRABNMOVE) {
+			if (hit.collider.gameObject != collidingObject && collidingObject)
+				hightlight (collidingObject, false);
 
-            SetCollidingObject(hit.collider);
-        }
-        else if(collidingObject)
-        {
-            hightlight(collidingObject, false);
-            collidingObject = null;
-            inventoryController = null;
-        }
+			moveSparkAt (hit.point, hit.normal, transform.forward);
+			if(hit.collider.gameObject != objectInHand)
+				vibrate (1 - hit.distance / grabDistance);
+			SetCollidingObject (hit.collider);
+		} else if (collidingObject) {
+			hightlight (collidingObject, false);
+			collidingObject = null;
+			inventoryController = null;
+			sparks.SetActive (false);
+		} else {
+			sparks.SetActive (false);
+		}
 
         if (state == ControllerState.PLIER)
         {

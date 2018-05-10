@@ -9,8 +9,12 @@ public class LaserPointer : MonoBehaviour {
     public GameObject teleportReticlePrefab;
     public GameObject laserPrefab;
     public Transform headTransform;
-    public Vector3 teleportReticleOffset;
+    public float teleportReticleOffset;
     public LayerMask teleportMask;
+	public float maxDist;
+
+	public Material teleportMaterial;
+	public Material noTeleportMaterial;
     
     // Private attributes
     private SteamVR_TrackedObject trackedObj;
@@ -37,7 +41,7 @@ public class LaserPointer : MonoBehaviour {
     {
 	    laser.SetActive(true);
         laserTransform.position = Vector3.Lerp(trackedObj.transform.position, hitPoint, .5f);
-        laserTransform.LookAt(hitPoint);
+		laserTransform.LookAt(hit.point);
         laserTransform.localScale = new Vector3(laserTransform.localScale.x, laserTransform.localScale.y,
             hit.distance);
     }
@@ -65,14 +69,24 @@ public class LaserPointer : MonoBehaviour {
 			
 			// Update laser position
             RaycastHit hit;
-            if (Physics.Raycast(trackedObj.transform.position, transform.forward, out hit, 100, teleportMask))
+			if (Physics.Raycast(trackedObj.transform.position, transform.forward, out hit,100))
             {
-                hitPoint = hit.point;
-                ShowLaser(hit);
+				hitPoint = hit.point;
+				ShowLaser (hit);
+				reticle.SetActive (true);
+				teleportReticleTransform.position = hitPoint + hit.normal*teleportReticleOffset;
+				teleportReticleTransform.forward = hit.normal;
 
-                reticle.SetActive(true);
-                teleportReticleTransform.position = hitPoint + teleportReticleOffset;
-                shouldTeleport = true;
+				if ((teleportMask.value & (1 << hit.collider.gameObject.layer)) != 0 &&
+					Vector3.Distance(hit.point,transform.position) < maxDist &&
+					Vector3.Dot(hit.normal,new Vector3(0,1,0)) > 0.5) {
+
+					shouldTeleport = true;
+					reticle.GetComponent<Renderer> ().material = teleportMaterial;
+				} else {
+					reticle.GetComponent<Renderer> ().material = noTeleportMaterial;
+					shouldTeleport = false;
+				}
             }
         }
         else
