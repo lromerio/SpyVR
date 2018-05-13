@@ -174,17 +174,6 @@ public class ControllerGrabObject : MonoBehaviour {
 		float t = 0f;
 		float maxt = 0.3f;
 		Vector3 startPos = transform.InverseTransformPoint(obj.transform.position);
-		/*PreferedRotation rot = obj.GetComponent<PreferedRotation> ();
-		if (rot) {
-			Vector3 startRot = obj.transform.eulerAngles;
-			while (t < maxt) {
-				float factor = t / maxt;
-				joint.targetRotation = Quaternion.Euler(Vector3.Lerp (startRot, rot.preferedRotation, factor));
-				joint.anchor = Vector3.Lerp (startPos, new Vector3 (0, 0, 1) * grabDistance, factor);
-				t += Time.deltaTime;
-				yield return 0; // leave the routine and return here in the next frame
-			}
-		} else {*/
 			while (t < maxt) {
 				float factor = t / maxt;
 				joint.anchor = Vector3.Lerp (startPos, new Vector3 (0, 0, 1) * grabDistance, factor);
@@ -232,16 +221,19 @@ public class ControllerGrabObject : MonoBehaviour {
         if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu)){
             switch(state)
             {
-                case ControllerState.GRABNMOVE:
-                    pliersModel.SetActive(true);
-                    controllerModel.SetActive(false);
-                    state = ControllerState.PLIER;
-                    break;
-                case ControllerState.PLIER:
-                    pliersModel.SetActive(false);
-                    controllerModel.SetActive(true);
-                    state = ControllerState.GRABNMOVE;
-                    break;
+			case ControllerState.GRABNMOVE:
+				pliersModel.SetActive (true);
+				controllerModel.SetActive (false);
+				GetComponent<Renderer> ().enabled = false;
+
+                state = ControllerState.PLIER;
+                break;
+            case ControllerState.PLIER:
+                pliersModel.SetActive(false);
+                controllerModel.SetActive(true);
+				GetComponent<Renderer> ().enabled = true;
+                state = ControllerState.GRABNMOVE;
+                break;
             }
         }
 

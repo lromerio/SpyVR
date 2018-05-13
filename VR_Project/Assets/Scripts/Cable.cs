@@ -32,11 +32,9 @@ public class Cable : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (pliers)
-            print("La merde");
 		if(pliers && pliers.cutting)
         {
-            cables.cut(this);
+            cables.Cut(this);
         }
 	}
 }
