@@ -14,6 +14,7 @@ public class TextTest : MonoBehaviour
 
 	// Hidden symbols
 	public TextMesh dark_text;
+    public List<Light> mustBeOff;
 
     // Command history
     private bool up; 
@@ -37,9 +38,11 @@ public class TextTest : MonoBehaviour
                 case "light":
                     HandleLight(cmd);
                     break;
+                /*
                 case "door":
                     HandleDoor(cmd);
                     break;
+                */
                 case "pc":
                     HandlePc(cmd);
                     break;
@@ -78,7 +81,8 @@ public class TextTest : MonoBehaviour
             l.enabled = cmd[2] == "on";
             feedback.color = success;
 
-			dark_text.gameObject.SetActive(!FindObjectsOfType<Light>().Any(c => c.enabled));
+            // Show hidden text
+			dark_text.gameObject.SetActive(!mustBeOff.Any(c => c.enabled));
 			return;
         }
         
@@ -120,9 +124,15 @@ public class TextTest : MonoBehaviour
 
     void HandlePc(string[] cmd)
     {
-        paper.SetActive(true);
+        if (cmd[1] == "5684668" && cmd[2] == "hack")
+        {
+            // "Print" paper
+            paper.SetActive(true);
+            feedback.color = success;
+            return;
+        }
 
-        feedback.color = success;
+        feedback.color = failure;
     }
 
     void UpdateCurrentCmd(int x)
