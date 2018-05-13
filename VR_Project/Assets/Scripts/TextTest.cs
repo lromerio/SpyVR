@@ -9,6 +9,7 @@ public class TextTest : MonoBehaviour
     // Input field
 	public InputField inputField;
 	public Text feedback;
+	public Cables cables;
     private Color success;
     private Color failure;
 
@@ -25,6 +26,7 @@ public class TextTest : MonoBehaviour
     // Paper
     public GameObject paper;
 
+	private string color_to_cut;
     void CallMe()
     {
         if (Input.GetKeyDown(KeyCode.Return) && inputField.text.Length > 0)
@@ -163,6 +165,13 @@ public class TextTest : MonoBehaviour
 		// Initialize text
 		dark_text.gameObject.SetActive(false);
         paper.SetActive(false);
+
+		 
+		color_to_cut = cables.ChooseToCutColor ();
+		string text = dark_text.text;
+		text = text.Replace ("%v", color_to_cut);
+		print (text);
+		dark_text.text = text;
     }
 
     void Update()
