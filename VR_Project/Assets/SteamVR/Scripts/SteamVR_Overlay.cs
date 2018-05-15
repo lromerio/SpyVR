@@ -38,6 +38,7 @@ public class SteamVR_Overlay : MonoBehaviour
 
 	void OnEnable()
 	{
+		print ("HERRE");
 		var overlay = OpenVR.Overlay;
 		if (overlay != null)
 		{

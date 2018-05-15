@@ -6,7 +6,7 @@ using UnityEngine;
 public class Timer : MonoBehaviour {
 
     public float remainingTime;
-    public static bool started;
+    public bool started;
 
 	// Use this for initialization
 	void Start () {
@@ -14,7 +14,7 @@ public class Timer : MonoBehaviour {
         started = false;
     }
 
-    public static void StartTimer()
+    public void StartTimer()
     {
         started = true;
     }
