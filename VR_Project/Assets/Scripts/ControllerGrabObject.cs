@@ -20,12 +20,13 @@ public class ControllerGrabObject : MonoBehaviour {
 	public LayerMask inventoryMask;
     public float grabDistance;
     private Color black = new Color(0, 0, 0, 1);
-    enum ControllerState {
+    public enum ControllerState {
         GRABNMOVE,
         PLIER
     }
 
-    ControllerState state;
+	[HideInInspector]
+    public ControllerState state;
 
     private SteamVR_Controller.Device Controller
     {

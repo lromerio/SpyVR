@@ -64,9 +64,8 @@ public class LaserPointer : MonoBehaviour {
     }
     
     void Update () {
-        if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip))
+		if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip) && GetComponent<ControllerGrabObject>().state == ControllerGrabObject.ControllerState.GRABNMOVE)
         {
-			
 			// Update laser position
             RaycastHit hit;
 			if (Physics.Raycast(trackedObj.transform.position, transform.forward, out hit,100))
@@ -92,6 +91,7 @@ public class LaserPointer : MonoBehaviour {
         else
         {
 			// Turn off laser
+			shouldTeleport = false;
             laser.SetActive(false);
             reticle.SetActive(false);
         }

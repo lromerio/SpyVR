@@ -28,6 +28,7 @@ public class Cables : MonoBehaviour {
     public List<GameObject> cut_cables;
 	public CablesEvent cables_on_fail;
 	public CablesEvent cables_on_sucess;
+	public bool failed = false;
 
 	private List<CableInstance> cable_instances = new List<CableInstance>();
 
@@ -52,12 +53,14 @@ public class Cables : MonoBehaviour {
 		print ("cut : " + cut_color);
 		if(cut_color != to_cut_color) {
 			//Failed! Trigger alarm!
+			failed = true;
 			cables_on_fail.Invoke(this);
 		} else {
 			cable_instances.Remove (cable_instances.Find (p => p.inst == cable.gameObject));
 			UpdatePresentColors ();
-			if (!present_colors.Contains (to_cut_color)) {
+			if (!present_colors.Contains (to_cut_color) && !failed) {
 				//All cable Cut! Sucess
+				GetComponent<AudioSource>().Play();
 				cables_on_sucess.Invoke(this);
 			}
 		}
