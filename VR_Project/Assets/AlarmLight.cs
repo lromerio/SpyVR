@@ -1,26 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AlarmLight : MonoBehaviour {
 
-    public float waitingTime = 0.3f;
-
+    Light l;
+    
 	void Start() {
-		GetComponent<Light> ().enabled = false;
+        l = GetComponent<Light>();
+        l.enabled = false;
 	}
 
-	public void StartAlarm(Cables _) {
-		StartCoroutine (StartAlarm ());
-	}
-
-	IEnumerator StartAlarm()
+    private void Update()
     {
-		GetComponent<AudioSource> ().Play ();
-        while (true)
-        {
-            GetComponent<Light>().enabled = !GetComponent<Light>().enabled; //toggle on/off the enabled property
-            yield return new WaitForSeconds(waitingTime);
-        }
+        l.enabled = GameObject.Find("GlobalTimer").GetComponent<Timer>().alarmOn;
     }
 }
