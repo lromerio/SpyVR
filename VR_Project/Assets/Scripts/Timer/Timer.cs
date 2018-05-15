@@ -2,16 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Timer : MonoBehaviour {
 
     public float remainingTime;
-    public bool started;
+    public static bool started;
+    private bool gameOver;
+    public float waitingTime = 0.3f;
+    public bool alarmOn;
 
-	// Use this for initialization
-	void Start () {
-        remainingTime = 600.0f;
-        started = false;
+    // Use this for initialization
+    void Start () {
+        remainingTime = 10.0f;
+        started = true;
+        gameOver = false;
+        alarmOn = false;
     }
 
     public void StartTimer()
@@ -30,11 +36,34 @@ public class Timer : MonoBehaviour {
                     t.Milliseconds);
 
         return s;
-}
-	
-	// Update is called once per frame
-	void Update () {
-        if (started)
+    }
+
+    IEnumerator Alarm()
+    {
+        GetComponent<AudioSource>().Play();
+        int c = 10;
+        while (c >= 0)
+        {
+            alarmOn = !alarmOn;
+            yield return new WaitForSeconds(waitingTime);
+            --c;
+        }
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    // Update is called once per frame
+    void Update () {
+        if (started && !gameOver)
+        {
             remainingTime -= Time.deltaTime;
+
+            if (remainingTime < 0)
+            {
+                remainingTime = 0.0f;
+                StartCoroutine(Alarm());
+                gameOver = true;
+            }
+        }
     }
 }
