@@ -13,9 +13,8 @@ Obviously, in order to reach their goal, the two player have to collaborate and 
 
 ## Commands
 ### Oracle Command line
-The _Oracle player_ has a command line at his disposal, which can be used to execute the three following commands.
+The _Oracle player_ has a command line at his disposal, which can be used to execute the following commands.
 - `pc <ID> hack` where <id> is the unique computer ID
-- `door <ID> <open/close>` where <id> is the unique door ID
 - `light <ID> <off/on>` where <id> is the unique light ID
 
 ### HTC Vive Controllers
@@ -23,80 +22,31 @@ The _Oracle player_ has a command line at his disposal, which can be used to exe
 
 ## Game Plot & Levels Description
 
-### Level 1
-##### Scenario & Key Objects
-- Alarm on the elevator
+#### Main Objects
 - A computer
+- A printer
+- A Key
 - Alarm cables
 - Something to cut the cables
 
-##### _VR player_ task
+#### _VR player_ task
 - Find the computer ID and communicate it to the _Oracle player_.
+- Find the key
 - Find the object to cut the alarm cables
-- Find the alarm cables
+- Find the alarm cables and use the key to open the "cable box"
 - Cut the correct cable in order to deactivate the alarm
 
-##### _Oracle player_ task
-- Hack the computer in the room and obtain the alarm specification
-- Communicate to the VR player which cable to cut
+#### _Oracle player_ task
+- Hack the computer, this will result in the printer printing the light IDs
+- Turn off the light, so that the hidden message is shown
+- Communicate to the VR player which cable to cut (based on the hidden message
 
-##### Failure
+#### Failure
 - The _VR player_ cuts the wrong cable
+- The timer counts down to zero
 
-### Level 2
-##### Scenario & Key Objects
-- Another elevator in the other side of the room
-- Multiple doors (resulting in a sort of labirint)
-- A key
-- A guard
-
-##### _VR player_ task
-- May communicate doors IDs to the _Oracle player_
-- Find the key
-- Reach the second elevator and use the key to open it
-
-##### _Oracle player_ task
-- Guide the _VR player_ through the room
-- Open/close the doors when necessary
-
-##### Failure
-- The guard see the _VR player_.
-
-### Level 3
-##### Scenario & Key Objects
-###### Floor 1
-- Something covering the floor
-- A printer (turned off)
-- Each light as an ID
-- Symbol on the floor, visible only when the lights are turned off
-
-###### Floor 2
-- A computer
-- Each light as an ID
-- Symbol on the floor, visible only when the lights are turned off
-
-###### Floor 3
-- All light turned off at the beginning
-- A poster mapping symbols to a numbers
-- A door behind protected by a code
-- An hint suggesting to turn off lights
-
-##### _VR player_ task
-- Turn of the printer
-- Comunicate the computer ID to the _Oracle player_
-- Take the paper printed by the _Oracle player_ and communicate lights IDs to him
-- Find the symbols described by the _Oracle_ inside the poster, and communicate the corresponding numbers to the _Oracle_
-
-##### _Oracle player_ task
-- Hack the computer and obtain the lights specification file
-- Print the lights specification file
-- Turn on/off lights and memorize symbols appearing on the floor (when the lights are turned off)
-- Describe the symbols to the _VR player_
-- Use the ID resulting from the poster mapping to hack and open the door
-
-##### Failure
-- Wrong ID used to hack the port
-
+#### Success
+- The _VR player_ cut the correct cable: an hidden room appears
 
 ## Authors
 - Collaud Jonathan - [JonathanCollaud](https://github.com/JonathanCollaud)
