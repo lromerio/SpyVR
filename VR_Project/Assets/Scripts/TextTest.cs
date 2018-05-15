@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,8 +10,9 @@ public class TextTest : MonoBehaviour
 	public InputField inputField;
 	public Text feedback;
 	public Cables cables;
-    private Color success;
-    private Color failure;
+	private Color success;
+	private Color failure;
+	private Color hints;
 
 	// Hidden symbols
 	public TextMesh dark_text;
@@ -26,7 +27,7 @@ public class TextTest : MonoBehaviour
     // Paper
     public GameObject paper;
 
-	private string color_to_cut;
+    private string color_to_cut;
     void CallMe()
     {
         if (Input.GetKeyDown(KeyCode.Return) && inputField.text.Length > 0)
@@ -34,9 +35,11 @@ public class TextTest : MonoBehaviour
             // Tokenize command
             string[] cmd = inputField.text.Split();
 
+			feedback.text = "";
+
             // Handle valid commands
             switch (cmd[0])
-            {
+			{
                 case "light":
                     HandleLight(cmd);
                     break;
@@ -48,13 +51,14 @@ public class TextTest : MonoBehaviour
                 case "pc":
                     HandlePc(cmd);
                     break;
-                default:
-                    feedback.color = failure;
+				default:
+					Help();
+					feedback.color = failure;
                     break;
             }
 
-            // Update command history and feedback field
-            feedback.text = inputField.text;
+			// Update command history and feedback field
+			feedback.text += inputField.text;
             cmd_history.Add(inputField.text);
             history_index = cmd_history.Count;
 
@@ -63,6 +67,13 @@ public class TextTest : MonoBehaviour
             inputField.ActivateInputField();
         }
     }
+
+	void Help() {
+		feedback.color = hints;
+		feedback.text = "Hints: ";
+		//feedback.text += "light <id> on|off, ";
+		feedback.text += "pc <id> hack";
+	}
 
     void HandleLight(string[] cmd)
     {
@@ -78,7 +89,7 @@ public class TextTest : MonoBehaviour
         }
 
         // If valid light and command, execute it
-        if (l != null && (cmd[2] == "off" || cmd[2] == "on"))
+		if (cmd.Length == 3 && l != null && (cmd[2] == "off" || cmd[2] == "on"))
         {
             l.enabled = cmd[2] == "on";
             feedback.color = success;
@@ -87,7 +98,8 @@ public class TextTest : MonoBehaviour
 			dark_text.gameObject.SetActive(!mustBeOff.Any(c => c.enabled));
 			return;
         }
-        
+
+		feedback.text += "Invalid argument: ";
         feedback.color = failure;
     }
 
@@ -121,12 +133,13 @@ public class TextTest : MonoBehaviour
 			}
 		}
 
+		feedback.text += "Invalid argument: ";
 		feedback.color = failure;
     }
 
     void HandlePc(string[] cmd)
     {
-        if (cmd[1] == "5684668" && cmd[2] == "hack")
+		if (cmd.Length == 3 && cmd[1] == "5684668" && cmd[2] == "hack")
         {
             // "Print" paper
             paper.SetActive(true);
@@ -134,6 +147,7 @@ public class TextTest : MonoBehaviour
             return;
         }
 
+		feedback.text += "Invalid argument: ";
         feedback.color = failure;
     }
 
@@ -153,8 +167,9 @@ public class TextTest : MonoBehaviour
         inputField.onEndEdit.AddListener(delegate { CallMe();});
 
         // Initialize colors
-        success = new Color(0.2f, 0.7f, 0.1f, 1.0f);
-        failure = new Color(0.7f, 0.2f, 0.1f, 1.0f);
+		success = new Color(0.2f, 0.7f, 0.1f, 1.0f);
+		failure = new Color(0.7f, 0.2f, 0.1f, 1.0f);
+		hints = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
         // Initialize command history
         up = false;
@@ -165,13 +180,13 @@ public class TextTest : MonoBehaviour
 		// Initialize text
 		dark_text.gameObject.SetActive(false);
         paper.SetActive(false);
+ 
 
-		 
-		color_to_cut = cables.ChooseToCutColor ();
-		string text = dark_text.text;
-		text = text.Replace ("%v", color_to_cut);
-		print (text);
-		dark_text.text = text;
+        color_to_cut = cables.ChooseToCutColor ();
+        string text = dark_text.text;
+        text = text.Replace ("%v", color_to_cut);
+        print (text);
+        dark_text.text = text;
     }
 
     void Update()

@@ -20,7 +20,7 @@ public class Timer : MonoBehaviour {
         alarmOn = false;
     }
 
-    public static void StartTimer()
+    public void StartTimer()
     {
         started = true;
     }

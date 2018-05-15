@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [System.Serializable]
-public class TimerEvent : UnityEvent<TimerCollision> { }
+public class TimerEvent : UnityEvent{ }
 
 public class TimerCollision : MonoBehaviour {
 
     public TimerEvent startTimer;
+	public GameObject to_check_for;
     private bool started;
 
     private void Start()
@@ -16,11 +17,11 @@ public class TimerCollision : MonoBehaviour {
         started = false;
     }
 
-    private void OnCollisionEnter(Collision collision)
+	void OnTriggerEnter(Collider collision)
     {
-        if (!started)
+		if (!started && collision.gameObject == to_check_for)
         {
-            startTimer.Invoke(this);
+            startTimer.Invoke();
             started = true;
         }
     }

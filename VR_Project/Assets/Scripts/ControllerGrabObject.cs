@@ -10,12 +10,14 @@ public class ControllerGrabObject : MonoBehaviour {
 	// Private attributes
     private SteamVR_TrackedObject trackedObj;
     private GameObject collidingObject;
-    public GameObject inventoryController;
     private GameObject objectInHand;
+	private GameObject inventorySlot;
     public GameObject pliersModel;
     public GameObject controllerModel;
     public GameObject sparks;
+	public Inventory inventory;
     public Color hightlightColor;
+	public LayerMask inventoryMask;
     public float grabDistance;
     private Color black = new Color(0, 0, 0, 1);
     enum ControllerState {
@@ -44,12 +46,6 @@ public class ControllerGrabObject : MonoBehaviour {
 
     private void SetCollidingObject(Collider col)
     {
-        
-
-        if (col.gameObject.GetComponent<Inventory>())
-        {
-            inventoryController = col.gameObject;
-        }
         if (interactive(col.gameObject))
         {
             hightlight(col.gameObject);
@@ -88,13 +84,20 @@ public class ControllerGrabObject : MonoBehaviour {
 
     private void GrabObject()
     {
-        if(collidingObject.tag == "InventoryItem")
-        {
+		if (inventorySlot) {
+			Vector3 oldpos = inventorySlot.transform.position;
+			collidingObject = inventory.TakeSlot (inventorySlot);
+			if (!collidingObject)
+				return;
+			collidingObject.transform.position = oldpos;
+		}
+
+		if (collidingObject.tag == "InventoryItem") {
 			// Extract object from inventory
 			Vector3 oldpos = collidingObject.transform.position;
-            collidingObject = collidingObject.GetComponentInParent<Inventory>().TakeObject(collidingObject);
+			collidingObject = collidingObject.GetComponentInParent<Inventory> ().TakeObject (collidingObject);
 			collidingObject.transform.position = oldpos;
-        }
+		}
         
         // Grab object
         if(collidingObject && (collidingObject.CompareTag("Grabable") || collidingObject.CompareTag("Storable")))
@@ -145,11 +148,11 @@ public class ControllerGrabObject : MonoBehaviour {
             objectInHand.GetComponent<Rigidbody>().angularVelocity = Controller.angularVelocity;
         }
         
-        if(inventoryController && objectInHand.CompareTag("Storable"))
+		if(inventorySlot && objectInHand.CompareTag("Storable"))
         {
             // Insert object in the inventory
             hightlight(objectInHand, false);
-            if(inventoryController.GetComponent<Inventory>().PutObject(objectInHand))
+			if(inventory.PutObject(inventorySlot,objectInHand))
                 Destroy(objectInHand);
         }
 
@@ -187,13 +190,13 @@ public class ControllerGrabObject : MonoBehaviour {
     void Update () {
         if (Controller.GetHairTriggerDown())
         {
-            if (collidingObject)
+			if (collidingObject || inventorySlot)
             {
                 GrabObject();
             }
         }
 
-        //Cast a ray
+        //Cast a general ray
         RaycastHit hit;
 		if (Physics.Raycast (transform.position, transform.forward, out hit, grabDistance) && state == ControllerState.GRABNMOVE) {
 			if (hit.collider.gameObject != collidingObject && collidingObject)
@@ -206,10 +209,19 @@ public class ControllerGrabObject : MonoBehaviour {
 		} else if (collidingObject) {
 			hightlight (collidingObject, false);
 			collidingObject = null;
-			inventoryController = null;
 			sparks.SetActive (false);
 		} else {
 			sparks.SetActive (false);
+		}
+
+		//Cast a ray to inventory item and slot
+
+		inventorySlot = null;
+		RaycastHit hit2;
+		if (Physics.Raycast (transform.position, transform.forward, out hit2, grabDistance, inventoryMask) && state == ControllerState.GRABNMOVE) {
+			if (hit2.collider.gameObject.CompareTag("InventorySlot")) {
+				inventorySlot = hit.collider.gameObject;
+			}
 		}
 
         if (state == ControllerState.PLIER)
