@@ -91,7 +91,7 @@ public class LaserPointer : MonoBehaviour {
         else
         {
 			// Turn off laser
-			shouldTeleport = false;
+			//shouldTeleport = false;
             laser.SetActive(false);
             reticle.SetActive(false);
         }

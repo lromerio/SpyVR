@@ -5,14 +5,17 @@
 	}
 	SubShader {
 		Tags { "RenderType"="Transparent" "Queue"="Transparent" "IgnoreProjector"="True"}
-		Lighting Off Cull Off ZWrite Off Fog {Mode Off}
+		//Lighting Off
+		Cull Off
+		ZWrite Off
+		Fog {Mode Off}
 		Blend SrcAlpha OneMinusSrcAlpha
 		Pass {
+			Lighting Off
 			Color [_Color]
 			SetTexture [_MainTex] {
 				combine primary, texture*primary
 			}
 		}
 	}
-	FallBack "Diffuse"
 }

@@ -72,7 +72,7 @@ public class TextTest : MonoBehaviour
 		feedback.color = hints;
 		feedback.text = "Hints: ";
 		//feedback.text += "light <id> on|off, ";
-		feedback.text += "pc <id> hack";
+		feedback.text += "pc <id> hack\n";
 	}
 
     void HandleLight(string[] cmd)

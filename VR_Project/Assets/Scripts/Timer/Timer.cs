@@ -14,8 +14,8 @@ public class Timer : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        remainingTime = 10.0f;
-        started = true;
+        //remainingTime = 10.0f;
+        started = false;
         gameOver = false;
         alarmOn = false;
     }
@@ -52,6 +52,13 @@ public class Timer : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+
+	public void GameOver() {
+		remainingTime = 0.0f;
+		StartCoroutine(Alarm());
+		gameOver = true;
+	}
+
     // Update is called once per frame
     void Update () {
         if (started && !gameOver)
@@ -60,9 +67,7 @@ public class Timer : MonoBehaviour {
 
             if (remainingTime < 0)
             {
-                remainingTime = 0.0f;
-                StartCoroutine(Alarm());
-                gameOver = true;
+				GameOver ();
             }
         }
     }
