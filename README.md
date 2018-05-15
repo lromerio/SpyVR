@@ -20,7 +20,7 @@ The _Oracle player_ has a command line at his disposal, which can be used to exe
 ### HTC Vive Controllers
 
 
-## Game Plot & Levels Description
+## Game Description
 
 #### Main Objects
 - A computer
