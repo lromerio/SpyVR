@@ -98,10 +98,13 @@ public class TextTest : MonoBehaviour
     void HandlePc(string[] cmd)
     {
         // Verify cmd and pc ID
-        if (cmd.Length == 3 && cmd[1] == "5684668" && cmd[2] == "hack")
+		if (cmd.Length == 3 && cmd[1] == "5684668" && cmd[2] == "hack")
         {
             // "Print" paper
-            paper.SetActive(true);
+			if (!paper.active) {
+				paper.SetActive (true);
+				paper.GetComponent<AudioSource> ().Play ();
+			}
             feedback.color = success;
             return;
         }

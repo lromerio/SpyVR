@@ -29,6 +29,7 @@ public class Cables : MonoBehaviour {
 	public CablesEvent cablesOnSucess;
 	public bool failed = false;
     public List<NamedMaterial> colors;
+	public AudioClip cutSound;
 
     private List<CableInstance> cable_instances = new List<CableInstance>();
 	private HashSet<string> present_colors;
@@ -37,7 +38,12 @@ public class Cables : MonoBehaviour {
     public void Cut(Cable cable)
     {
         Material m = Instantiate(cable.GetComponent<Renderer>().material) as Material;
+
         GameObject cut_inst = Instantiate(cutCables[Random.Range(0, cutCables.Count)],transform);
+		AudioSource asource = cut_inst.AddComponent<AudioSource> ();
+		asource.clip = cutSound;
+		asource.spatialBlend = 1f;
+		asource.Play ();
         cut_inst.GetComponent<Renderer>().material = m;
         cut_inst.transform.localPosition = cable.transform.localPosition;
 
@@ -96,6 +102,7 @@ public class Cables : MonoBehaviour {
             Material m = nm.material;
             GameObject prefab = cablesPrefabs[Random.Range(0, cablesPrefabs.Count)];
             GameObject inst = Instantiate(prefab, transform);
+
             inst.GetComponent<Renderer>().material = m;
             BoxCollider bc = inst.AddComponent<BoxCollider>();
             inst.AddComponent<Cable>().cables = this;

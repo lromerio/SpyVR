@@ -12,7 +12,7 @@ public class Timer : MonoBehaviour {
     [HideInInspector]
     public bool alarmOn;
     [HideInInspector]
-    public static bool started;
+    public bool started;
 
 
     void Start ()
@@ -28,17 +28,10 @@ public class Timer : MonoBehaviour {
         started = true;
     }
 
-    public string GetTimeLeft()
-    {
-
-        TimeSpan t = TimeSpan.FromSeconds(remainingTime);
-        string s = string.Format("{0:D2}:{1:D2}:{2:D3}",
-                    t.Minutes,
-                    t.Seconds,
-                    t.Milliseconds);
-
-        return s;
-    }
+	public void StopTimer()
+	{
+		started = false;
+	}
 
     IEnumerator Alarm()
     {
@@ -57,9 +50,11 @@ public class Timer : MonoBehaviour {
 
 	public void GameOver()
     {
-		remainingTime = 0.0f;
-		StartCoroutine(Alarm());
-		gameOver = true;
+		if (!gameOver) {
+			remainingTime = 0.0f;
+			StartCoroutine (Alarm ());
+			gameOver = true;
+		}
 	}
 
     void Update ()
