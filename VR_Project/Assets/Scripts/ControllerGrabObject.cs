@@ -231,11 +231,8 @@ public class ControllerGrabObject : MonoBehaviour {
 			print (tangibleObject);
 
 			if (hoveredObject) { //Button and such
-				print("colliding");
-			
 				ControllerTriggerable tr = hoveredObject.GetComponent<ControllerTriggerable>();
 				if (tr) {
-					print("CCACAAA");
 					tr.OnControllerTrigger ();
 				}
 			}
