@@ -9,7 +9,8 @@ public class ControllerGrabObject : MonoBehaviour {
 
 	// Private attributes
     private SteamVR_TrackedObject trackedObj;
-    private GameObject collidingObject;
+	private GameObject tangibleObject;
+	private GameObject hoveredObject;
     private GameObject objectInHand;
 	private GameObject inventorySlot;
     public GameObject pliersModel;
@@ -50,13 +51,14 @@ public class ControllerGrabObject : MonoBehaviour {
         if (interactive(col.gameObject))
         {
             hightlight(col.gameObject);
-            if(col.gameObject != collidingObject) //If new object hovered
+            if(col.gameObject != tangibleObject) //If new object hovered
             {
                 //Vibrate
                 Controller.TriggerHapticPulse(3999);
             }
-            collidingObject = col.gameObject;
+            tangibleObject = col.gameObject;
         }
+		hoveredObject = col.gameObject;
     }
 
 	private void vibrate(float intensity) {
@@ -87,30 +89,30 @@ public class ControllerGrabObject : MonoBehaviour {
     {
 		if (inventorySlot) {
 			Vector3 oldpos = inventorySlot.transform.position;
-			collidingObject = inventory.TakeSlot (inventorySlot);
-			if (!collidingObject)
+			tangibleObject = inventory.TakeSlot (inventorySlot);
+			if (!tangibleObject)
 				return;
-			collidingObject.transform.position = oldpos;
+			tangibleObject.transform.position = oldpos;
 		}
 
-		if (collidingObject.tag == "InventoryItem") {
+		if (tangibleObject.tag == "InventoryItem") {
 			// Extract object from inventory
-			Vector3 oldpos = collidingObject.transform.position;
-			collidingObject = collidingObject.GetComponentInParent<Inventory> ().TakeObject (collidingObject);
-			collidingObject.transform.position = oldpos;
+			Vector3 oldpos = tangibleObject.transform.position;
+			tangibleObject = tangibleObject.GetComponentInParent<Inventory> ().TakeObject (tangibleObject);
+			tangibleObject.transform.position = oldpos;
 		}
         
         // Grab object
-        if(collidingObject && (collidingObject.CompareTag("Grabable") || collidingObject.CompareTag("Storable")))
+        if(tangibleObject && (tangibleObject.CompareTag("Grabable") || tangibleObject.CompareTag("Storable")))
         {     
-            objectInHand = collidingObject;
+            objectInHand = tangibleObject;
 
 			bool alreadyContrained = objectInHand.GetComponent<Joint> () != null;
 
 			var joint = AddFixedJoint(alreadyContrained);
 			if(!alreadyContrained) StartCoroutine (MoveObjectToGrab (joint,objectInHand));
             joint.connectedBody = objectInHand.GetComponent<Rigidbody>();
-            collidingObject = null;
+            tangibleObject = null;
         }
     }
 
@@ -178,7 +180,7 @@ public class ControllerGrabObject : MonoBehaviour {
 		float t = 0f;
 		float maxt = 0.3f;
 		Vector3 startPos = transform.InverseTransformPoint(obj.transform.position);
-			while (t < maxt) {
+			while (t < maxt && joint) {
 				float factor = t / maxt;
 				joint.anchor = Vector3.Lerp (startPos, new Vector3 (0, 0, 1) * grabDistance, factor);
 				t += Time.deltaTime;
@@ -189,27 +191,21 @@ public class ControllerGrabObject : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (Controller.GetHairTriggerDown())
-        {
-			if (collidingObject || inventorySlot)
-            {
-                GrabObject();
-            }
-        }
 
-        //Cast a general ray
-        RaycastHit hit;
+		//Cast a general ray
+		hoveredObject = null;
+		RaycastHit hit;
 		if (Physics.Raycast (transform.position, transform.forward, out hit, grabDistance) && state == ControllerState.GRABNMOVE) {
-			if (hit.collider.gameObject != collidingObject && collidingObject)
-				hightlight (collidingObject, false);
+			if (hit.collider.gameObject != tangibleObject && tangibleObject)
+				hightlight (tangibleObject, false);
 
 			moveSparkAt (hit.point, hit.normal, transform.forward);
 			if(hit.collider.gameObject != objectInHand)
 				vibrate (1 - hit.distance / grabDistance);
 			SetCollidingObject (hit.collider);
-		} else if (collidingObject) {
-			hightlight (collidingObject, false);
-			collidingObject = null;
+		} else if (tangibleObject) {
+			hightlight (tangibleObject, false);
+			tangibleObject = null;
 			sparks.SetActive (false);
 		} else {
 			sparks.SetActive (false);
@@ -224,6 +220,26 @@ public class ControllerGrabObject : MonoBehaviour {
 				inventorySlot = hit.collider.gameObject;
 			}
 		}
+
+        if (Controller.GetHairTriggerDown())
+        {
+			if (tangibleObject || inventorySlot)
+            {
+                GrabObject();
+            }
+
+			print (tangibleObject);
+
+			if (hoveredObject) { //Button and such
+				print("colliding");
+			
+				ControllerTriggerable tr = hoveredObject.GetComponent<ControllerTriggerable>();
+				if (tr) {
+					print("CCACAAA");
+					tr.OnControllerTrigger ();
+				}
+			}
+        }
 
         if (state == ControllerState.PLIER)
         {

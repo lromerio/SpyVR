@@ -5,7 +5,7 @@ using System.Collections;
 /// VR gripped button. Requires VR button. This button responds to being "clicked" rather than a physical press.
 /// </summary>
 [RequireComponent(typeof(VRButton))]
-public class VRGrippedButton : MonoBehaviour {
+public class VRGrippedButton : ControllerTriggerable {
 
 	/// <summary>
 	/// Animation that makes the button press down
@@ -29,17 +29,22 @@ public class VRGrippedButton : MonoBehaviour {
 		collider.isTrigger = true; // This button should only work as a trigger
 	}
 
-	void OnTriggerEnter(Collider _collider)
+	/*void OnTriggerEnter(Collider _collider)
 	{
 		if (Button.Interactable == true)
 			ActivateButton (_collider.attachedRigidbody);
+	}*/
+
+	public override void  OnControllerTrigger() {
+		if (Button.Interactable == true)
+			ActivateButton ();
 	}
 
 	/// <summary>
 	/// Triggers the button if the controllers action key is down
 	/// </summary>
 	/// <param name="_controllerBody">Controller body.</param>
-	public void ActivateButton(Rigidbody _controllerBody)
+	/*public void ActivateButton(Rigidbody _controllerBody)
 	{
 		if (_controllerBody == null)
 			return;
@@ -56,6 +61,11 @@ public class VRGrippedButton : MonoBehaviour {
 			if (ButtonAnim != null)
 				ButtonAnim.Play ();
 		}
+	}*/
+	public void ActivateButton()
+	{
+		if (ButtonAnim != null)
+			ButtonAnim.Play ();
 	}
 
 }

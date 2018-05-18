@@ -69,7 +69,8 @@ public class Inventory : MonoBehaviour {
 			if (slot.content == null)
 				continue;
 			GameObject prefab = slot.content;
-			GameObject inst = Instantiate(prefab,this.transform);
+			GameObject inst = Instantiate(prefab);
+			inst.transform.parent = this.transform;
             inst.SetActive(true);
 
             inst.GetComponent<Rigidbody>().isKinematic = true;
