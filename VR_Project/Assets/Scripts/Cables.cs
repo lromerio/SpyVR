@@ -87,7 +87,7 @@ public class Cables : MonoBehaviour {
 		}
 	}
 
-	void Start ()
+	void Awake ()
     {
 		//Generate random cables
         foreach(int i in System.Linq.Enumerable.Range(0,cableCount))
