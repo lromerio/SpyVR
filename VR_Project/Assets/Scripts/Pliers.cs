@@ -1,39 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Pliers : MonoBehaviour {
 
-    Animator animator;
-	// Use this for initialization
-    public bool cutting
-    {
-        get { return old_val < new_val && new_val > 0.9; }
-    }
-
-    float old_val = 0f;
-    float new_val = 0f;
-	void Start () {
-        //animation.Play();
-    }
+    private Animator animator;
+    private float oldVal;
+    private float newVal;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
-       
     }
 
+    void Start () {
+        oldVal = 0f;
+        newVal = 0f;
+    }
 
-
-    public void set_closed_value(float val)
+    public bool Cutting
     {
-        old_val = new_val;
+        get { return oldVal < newVal && newVal > 0.9; }
+    }
+
+    public void SetClosedValue(float val)
+    {
+        oldVal = newVal;
         if (animator.runtimeAnimatorController != null)
             animator.Play("Pinch", 0, val);
-        new_val = val;
+        newVal = val;
     }
-	
-	// Update is called once per frame
-	void Update () {
-	}
 }

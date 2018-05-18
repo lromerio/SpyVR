@@ -1,13 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 
 public class AlarmLight : MonoBehaviour {
 
-    Light l;
+    private Light l;
     
-	void Start() {
+	void Start()
+    {
         l = GetComponent<Light>();
         l.enabled = false;
 	}

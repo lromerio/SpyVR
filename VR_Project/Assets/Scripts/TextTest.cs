@@ -9,14 +9,9 @@ public class TextTest : MonoBehaviour
     // Input field
 	public InputField inputField;
 	public Text feedback;
-	public Cables cables;
 	private Color success;
 	private Color failure;
 	private Color hints;
-
-	// Hidden symbols
-	public TextMesh dark_text;
-    public List<Light> mustBeOff;
 
     // Command history
     private bool up; 
@@ -24,10 +19,13 @@ public class TextTest : MonoBehaviour
     private List<string> cmd_history;
     private int history_index;
 
-    // Paper
+    // Puzzles related
     public GameObject paper;
-
+    public TextMesh hidden_text;
+    public List<Light> must_be_off;
+    public Cables cables;
     private string color_to_cut;
+
     void CallMe()
     {
         if (Input.GetKeyDown(KeyCode.Return) && inputField.text.Length > 0)
@@ -43,17 +41,11 @@ public class TextTest : MonoBehaviour
                 case "light":
                     HandleLight(cmd);
                     break;
-                /*
-                case "door":
-                    HandleDoor(cmd);
-                    break;
-                */
                 case "pc":
                     HandlePc(cmd);
                     break;
 				default:
 					Help();
-					feedback.color = failure;
                     break;
             }
 
@@ -71,9 +63,9 @@ public class TextTest : MonoBehaviour
 	void Help() {
 		feedback.color = hints;
 		feedback.text = "Hints: ";
-		//feedback.text += "light <id> on|off, ";
 		feedback.text += "pc <id> hack\n";
-	}
+        feedback.color = failure;
+    }
 
     void HandleLight(string[] cmd)
     {
@@ -95,7 +87,7 @@ public class TextTest : MonoBehaviour
             feedback.color = success;
 
             // Show hidden text
-			dark_text.gameObject.SetActive(!mustBeOff.Any(c => c.enabled));
+			hidden_text.gameObject.SetActive(!must_be_off.Any(c => c.enabled));
 			return;
         }
 
@@ -103,43 +95,10 @@ public class TextTest : MonoBehaviour
         feedback.color = failure;
     }
 
-	void HandleDoor(string[] cmd)
-    {
-		// Try to get door
-		GameObject obj = null;
-		try
-		{
-			obj = GameObject.Find(cmd[1]);
-		}
-		catch
-		{
-			// Do nothing
-		}
-
-		// If valid light and command, execute it
-		if (obj != null)
-		{
-			Door door = obj.GetComponent<Door> (); 
-			if (cmd [2] == "open") {
-				door.move_y(1.7f * door.transform.localScale.y);
-				feedback.color = success;
-				return;
-			}
-
-			if (cmd [2] == "close") {
-				door.move_y(0.1857729f * door.transform.localScale.y);
-				feedback.color = success;
-				return;
-			}
-		}
-
-		feedback.text += "Invalid argument: ";
-		feedback.color = failure;
-    }
-
     void HandlePc(string[] cmd)
     {
-		if (cmd.Length == 3 && cmd[1] == "5684668" && cmd[2] == "hack")
+        // Verify cmd and pc ID
+        if (cmd.Length == 3 && cmd[1] == "5684668" && cmd[2] == "hack")
         {
             // "Print" paper
             paper.SetActive(true);
@@ -177,16 +136,16 @@ public class TextTest : MonoBehaviour
         cmd_history = new List<string>();
         history_index = 0;
 
-		// Initialize text
-		dark_text.gameObject.SetActive(false);
+		// Initialize puzzles related
+		hidden_text.gameObject.SetActive(false);
         paper.SetActive(false);
- 
-
         color_to_cut = cables.ChooseToCutColor ();
-        string text = dark_text.text;
+        string text = hidden_text.text;
         text = text.Replace ("%v", color_to_cut);
-        print (text);
-        dark_text.text = text;
+        hidden_text.text = text;
+
+        // Print cables to cut
+        print(text);
     }
 
     void Update()

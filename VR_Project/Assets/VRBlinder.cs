@@ -1,62 +1,60 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class VRBlinder : MonoBehaviour {
 
 	HashSet<Collider> colliders = new HashSet<Collider>();
-	HashSet<Collider> current_walls = new HashSet<Collider>();
-	public List<Collider> ignore_list;
+	HashSet<Collider> currentWalls = new HashSet<Collider>();
+	public List<Collider> ignoreList;
 	public List<Collider> walls;
-	public float transition_time;
-	public float repulse_fac;
-	public GameObject camera_rig;
+	public float transitionTime;
+	public float repulseFac;
+	public GameObject cameraRig;
 	private Collider wall;
-	private Vector3 last_pos;
-	private Vector3 last_free_pos;
+	private Vector3 lastPos;
+	private Vector3 lastFreePos;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-
-
-	void UpdateFade() {
+	void UpdateFade()
+    {
 		if (colliders.Count == 0)
-			SteamVR_Fade.View (Color.clear, transition_time);
+			SteamVR_Fade.View (Color.clear, transitionTime);
 		else
-			SteamVR_Fade.View (Color.black, transition_time);
-		
+			SteamVR_Fade.View (Color.black, transitionTime);
 	}
 
-	bool inWalls() {
-		return current_walls.Count != 0;
+	bool InWalls()
+    {
+		return currentWalls.Count != 0;
 	}
 
-	void OnTriggerEnter(Collider col) {
-		if(!ignore_list.Contains(col))
+	void OnTriggerEnter(Collider col)
+    {
+		if(!ignoreList.Contains(col))
 			colliders.Add (col);
-		if (walls.Contains (col)) {
-			current_walls.Add (col);
-		}
+
+		if (walls.Contains (col))
+			currentWalls.Add (col);
+
 		UpdateFade ();
 	}
 
-	void OnTriggerExit(Collider col) {
+	void OnTriggerExit(Collider col)
+    {
 		colliders.Remove (col);
-		current_walls.Remove (col);
+		currentWalls.Remove (col);
 		UpdateFade ();
 	}
 
-
-	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
 		Vector3 pos = transform.position;
-		if (inWalls()) {
-			Vector3 delta = pos - last_pos;
+
+		if (InWalls()) {
+			Vector3 delta = pos - lastPos;
 			delta.y = 0;
-			camera_rig.transform.position -= repulse_fac*delta;
+			cameraRig.transform.position -= repulseFac*delta;
 		}
-		last_pos = pos;
+
+		lastPos = pos;
 	}
 }

@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Timer : MonoBehaviour {
 
-    public float remainingTime;
-    public static bool started;
+    private float remainingTime;
     private bool gameOver;
-    public float waitingTime = 0.3f;
-    public bool alarmOn;
+    public float waitingTime;
 
-    // Use this for initialization
-    void Start () {
-        //remainingTime = 10.0f;
+    [HideInInspector]
+    public bool alarmOn;
+    [HideInInspector]
+    public static bool started;
+
+
+    void Start ()
+    {
+        waitingTime = 0.3f;
         started = false;
         gameOver = false;
         alarmOn = false;
@@ -29,7 +32,6 @@ public class Timer : MonoBehaviour {
     {
 
         TimeSpan t = TimeSpan.FromSeconds(remainingTime);
-
         string s = string.Format("{0:D2}:{1:D2}:{2:D3}",
                     t.Minutes,
                     t.Seconds,
@@ -53,14 +55,15 @@ public class Timer : MonoBehaviour {
     }
 
 
-	public void GameOver() {
+	public void GameOver()
+    {
 		remainingTime = 0.0f;
 		StartCoroutine(Alarm());
 		gameOver = true;
 	}
 
-    // Update is called once per frame
-    void Update () {
+    void Update ()
+    {
         if (started && !gameOver)
         {
             remainingTime -= Time.deltaTime;

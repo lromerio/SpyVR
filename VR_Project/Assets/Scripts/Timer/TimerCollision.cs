@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 [System.Serializable]
@@ -8,9 +6,9 @@ public class TimerEvent : UnityEvent{ }
 
 public class TimerCollision : MonoBehaviour {
 
+    public GameObject toCheckFor;
     public TimerEvent startTimer;
-	public GameObject to_check_for;
-    private bool started;
+	private bool started;
 
     private void Start()
     {
@@ -19,7 +17,7 @@ public class TimerCollision : MonoBehaviour {
 
 	void OnTriggerEnter(Collider collision)
     {
-		if (!started && collision.gameObject == to_check_for)
+		if (!started && collision.gameObject == toCheckFor)
         {
             startTimer.Invoke();
             started = true;

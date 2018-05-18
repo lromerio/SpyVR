@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LaserPointer : MonoBehaviour {
 
@@ -12,7 +10,6 @@ public class LaserPointer : MonoBehaviour {
     public float teleportReticleOffset;
     public LayerMask teleportMask;
 	public float maxDist;
-
 	public Material teleportMaterial;
 	public Material noTeleportMaterial;
     
@@ -25,7 +22,6 @@ public class LaserPointer : MonoBehaviour {
     private Transform teleportReticleTransform;
     private bool shouldTeleport;
 
-
     private SteamVR_Controller.Device Controller
     {
         get { return SteamVR_Controller.Input((int)trackedObj.index); }
@@ -36,7 +32,15 @@ public class LaserPointer : MonoBehaviour {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
     }
 
-	// Turn on teleport laser and transform it according to current position
+    void Start()
+    {
+        laser = Instantiate(laserPrefab);
+        laserTransform = laser.transform;
+        reticle = Instantiate(teleportReticlePrefab);
+        teleportReticleTransform = reticle.transform;
+    }
+
+    // Turn on teleport laser and transform it according to current position
     private void ShowLaser(RaycastHit hit)
     {
 	    laser.SetActive(true);
@@ -55,16 +59,11 @@ public class LaserPointer : MonoBehaviour {
         difference.y = 0;
         cameraRigTransform.position = hitPoint + difference;
     }
-
-    void Start () {
-        laser = Instantiate(laserPrefab);
-        laserTransform = laser.transform;
-        reticle = Instantiate(teleportReticlePrefab);
-        teleportReticleTransform = reticle.transform;
-    }
     
-    void Update () {
-		if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip) && GetComponent<ControllerGrabObject>().state == ControllerGrabObject.ControllerState.GRABNMOVE)
+    void Update ()
+    {
+		if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip) &
+            GetComponent<ControllerGrabObject>().state == ControllerGrabObject.ControllerState.GRABNMOVE)
         {
 			// Update laser position
             RaycastHit hit;
@@ -78,11 +77,13 @@ public class LaserPointer : MonoBehaviour {
 
 				if ((teleportMask.value & (1 << hit.collider.gameObject.layer)) != 0 &&
 					Vector3.Distance(hit.point,transform.position) < maxDist &&
-					Vector3.Dot(hit.normal,new Vector3(0,1,0)) > 0.5) {
-
+					Vector3.Dot(hit.normal,new Vector3(0,1,0)) > 0.5)
+                {
 					shouldTeleport = true;
 					reticle.GetComponent<Renderer> ().material = teleportMaterial;
-				} else {
+				}
+                else
+                {
 					reticle.GetComponent<Renderer> ().material = noTeleportMaterial;
 					shouldTeleport = false;
 				}
@@ -91,15 +92,12 @@ public class LaserPointer : MonoBehaviour {
         else
         {
 			// Turn off laser
-			//shouldTeleport = false;
             laser.SetActive(false);
             reticle.SetActive(false);
         }
 
+        // Teleport
         if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Grip) && shouldTeleport)
-        {
-			// Teleport
             Teleport();
-        }
     }
 }

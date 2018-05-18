@@ -1,18 +1,24 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Curve;
-using Tubular;
-
 
 public class ControllerGrabObject : MonoBehaviour {
 
-	// Private attributes
+    public enum ControllerState
+    {
+        GRABNMOVE,
+        PLIER
+    }
+
+    // Private attributes
     private SteamVR_TrackedObject trackedObj;
 	private GameObject tangibleObject;
 	private GameObject hoveredObject;
     private GameObject objectInHand;
 	private GameObject inventorySlot;
+    private Color black;
+
+    // Public attributes
     public GameObject pliersModel;
     public GameObject controllerModel;
     public GameObject sparks;
@@ -20,12 +26,6 @@ public class ControllerGrabObject : MonoBehaviour {
     public Color hightlightColor;
 	public LayerMask inventoryMask;
     public float grabDistance;
-    private Color black = new Color(0, 0, 0, 1);
-    public enum ControllerState {
-        GRABNMOVE,
-        PLIER
-    }
-
 	[HideInInspector]
     public ControllerState state;
 
@@ -39,16 +39,17 @@ public class ControllerGrabObject : MonoBehaviour {
         pliersModel.SetActive(false);
         trackedObj = GetComponent<SteamVR_TrackedObject>();
         GenerateTube();
+        black = new Color(0, 0, 0, 1);
     }
 
-    bool interactive(GameObject obj)
+    bool Interactive(GameObject obj)
     {
         return obj.CompareTag("Grabable") || obj.CompareTag("Storable") || obj.CompareTag("InventoryItem");
     }
 
     private void SetCollidingObject(Collider col)
     {
-        if (interactive(col.gameObject))
+        if (Interactive(col.gameObject))
         {
             hightlight(col.gameObject);
             if(col.gameObject != tangibleObject) //If new object hovered
@@ -123,10 +124,12 @@ public class ControllerGrabObject : MonoBehaviour {
         ConfigurableJoint fx = gameObject.AddComponent<ConfigurableJoint>();
         fx.breakForce = 30000;
         fx.breakTorque = 30000;
+
 		if (!dontMessAnchor) {
 			fx.autoConfigureConnectedAnchor = false;
 			fx.connectedAnchor = new Vector3 (0, 0, 0);
 		}
+
         fx.xMotion = ConfigurableJointMotion.Limited;
         fx.yMotion = ConfigurableJointMotion.Limited;
         fx.zMotion = ConfigurableJointMotion.Limited;
@@ -180,13 +183,13 @@ public class ControllerGrabObject : MonoBehaviour {
 		float t = 0f;
 		float maxt = 0.3f;
 		Vector3 startPos = transform.InverseTransformPoint(obj.transform.position);
-			while (t < maxt && joint) {
-				float factor = t / maxt;
-				joint.anchor = Vector3.Lerp (startPos, new Vector3 (0, 0, 1) * grabDistance, factor);
-				t += Time.deltaTime;
-				yield return 0; // leave the routine and return here in the next frame
-			}
-		//}
+
+        while (t < maxt && joint) {
+			float factor = t / maxt;
+			joint.anchor = Vector3.Lerp (startPos, new Vector3 (0, 0, 1) * grabDistance, factor);
+			t += Time.deltaTime;
+			yield return 0; // leave the routine and return here in the next frame
+		}
 	}
 
     // Update is called once per frame
@@ -195,47 +198,49 @@ public class ControllerGrabObject : MonoBehaviour {
 		//Cast a general ray
 		hoveredObject = null;
 		RaycastHit hit;
-		if (Physics.Raycast (transform.position, transform.forward, out hit, grabDistance) && state == ControllerState.GRABNMOVE) {
+		if (Physics.Raycast (transform.position, transform.forward, out hit, grabDistance) &&
+            state == ControllerState.GRABNMOVE) {
+
 			if (hit.collider.gameObject != tangibleObject && tangibleObject)
 				hightlight (tangibleObject, false);
 
 			moveSparkAt (hit.point, hit.normal, transform.forward);
+
 			if(hit.collider.gameObject != objectInHand)
 				vibrate (1 - hit.distance / grabDistance);
+
 			SetCollidingObject (hit.collider);
-		} else if (tangibleObject) {
+
+		}
+        else if (tangibleObject)
+        {
 			hightlight (tangibleObject, false);
 			tangibleObject = null;
 			sparks.SetActive (false);
-		} else {
+		}
+        else
+        {
 			sparks.SetActive (false);
 		}
 
 		//Cast a ray to inventory item and slot
-
 		inventorySlot = null;
 		RaycastHit hit2;
-		if (Physics.Raycast (transform.position, transform.forward, out hit2, grabDistance, inventoryMask) && state == ControllerState.GRABNMOVE) {
-			if (hit2.collider.gameObject.CompareTag("InventorySlot")) {
+		if (Physics.Raycast (transform.position, transform.forward, out hit2, grabDistance, inventoryMask) &&
+            state == ControllerState.GRABNMOVE)
+        {
+			if (hit2.collider.gameObject.CompareTag("InventorySlot"))
 				inventorySlot = hit.collider.gameObject;
-			}
 		}
 
         if (Controller.GetHairTriggerDown())
         {
 			if (tangibleObject || inventorySlot)
-            {
                 GrabObject();
-            }
 
-			print (tangibleObject);
-
-			if (hoveredObject) { //Button and such
-				print("colliding");
-			
+			if (hoveredObject) { //Button and such			
 				ControllerTriggerable tr = hoveredObject.GetComponent<ControllerTriggerable>();
 				if (tr) {
-					print("CCACAAA");
 					tr.OnControllerTrigger ();
 				}
 			}
@@ -244,34 +249,33 @@ public class ControllerGrabObject : MonoBehaviour {
         if (state == ControllerState.PLIER)
         {
             float val = Controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x;
-            pliersModel.GetComponent<Pliers>().set_closed_value(val);
+            pliersModel.GetComponent<Pliers>().SetClosedValue(val);
         }
 
-        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu)){
+        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.ApplicationMenu))
+        {
             switch(state)
             {
-			case ControllerState.GRABNMOVE:
-				pliersModel.SetActive (true);
-				controllerModel.SetActive (false);
-				GetComponent<Renderer> ().enabled = false;
+			    case ControllerState.GRABNMOVE:
+				    pliersModel.SetActive (true);
+				    controllerModel.SetActive (false);
+				    GetComponent<Renderer> ().enabled = false;
 
-                state = ControllerState.PLIER;
-                break;
-            case ControllerState.PLIER:
-                pliersModel.SetActive(false);
-                controllerModel.SetActive(true);
-				GetComponent<Renderer> ().enabled = true;
-                state = ControllerState.GRABNMOVE;
-                break;
+                    state = ControllerState.PLIER;
+                    break;
+                case ControllerState.PLIER:
+                    pliersModel.SetActive(false);
+                    controllerModel.SetActive(true);
+				    GetComponent<Renderer> ().enabled = true;
+                    state = ControllerState.GRABNMOVE;
+                    break;
             }
         }
 
         if (Controller.GetHairTriggerUp())
         {
             if (objectInHand)
-            {
                 ReleaseObject();
-            }
         }
     }
 }

@@ -1,32 +1,28 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour {
 
-
 	// Public attributes
     [HideInInspector]
-    public bool shown = false;
+    public bool shown;
     public float radius;
-    public float max_angle;
-    public float obj_scale;
-	public uint object_count;
+    public float maxAngle;
+    public float objScale;
+	public uint objectCount;
+	public GameObject slotPrefab;
 
-	public GameObject slot_prefab;
-
+    // InventorySlot
 	public class InventorySlot {
 		public GameObject slot;
 		public GameObject content;
 		public GameObject shown;
 	}
-
 	public InventorySlot[] inventory;
     
 	// Private attributes
 	private Dictionary<GameObject, InventorySlot> objToSlot;
 	private Dictionary<GameObject, InventorySlot> shownToSlot;
-
     private SteamVR_TrackedObject trackedObj;
 
     private SteamVR_Controller.Device Controller
@@ -34,21 +30,22 @@ public class Inventory : MonoBehaviour {
         get { return SteamVR_Controller.Input((int)trackedObj.index); }
     }
 
-
     void Awake()
     {
+        shown = false;
+
         trackedObj = GetComponent<SteamVR_TrackedObject>();
-		inventory = new InventorySlot[object_count];
+		inventory = new InventorySlot[objectCount];
 
 		objToSlot = new Dictionary<GameObject, InventorySlot> ();
 
-		for (int i = 0; i < object_count; i++) {
-			GameObject slot =  Instantiate (slot_prefab, this.transform);
+		for (int i = 0; i < objectCount; i++) {
+			GameObject slot =  Instantiate (slotPrefab, this.transform);
 			inventory [i] = new InventorySlot ();
 			inventory[i].slot = slot;
 			slot.transform.position = transform.position;
-			slot.transform.localScale *= obj_scale/1.5f;
-			float instAngle = Mathf.Lerp(-max_angle, max_angle, i / (float)(inventory.Length)) + Mathf.PI/2;
+			slot.transform.localScale *= objScale/1.5f;
+			float instAngle = Mathf.Lerp(-maxAngle, maxAngle, i / (float)(inventory.Length)) + Mathf.PI/2;
 			var offset = new Vector3(Mathf.Cos(instAngle), 0, Mathf.Sin(instAngle))*radius;
 			slot.transform.Translate(transform.TransformVector(offset),Space.World);
 			objToSlot.Add(slot, inventory [i]);
@@ -76,30 +73,13 @@ public class Inventory : MonoBehaviour {
             inst.GetComponent<Rigidbody>().isKinematic = true;
             inst.GetComponent<Rigidbody>().useGravity = false;
             inst.layer = LayerMask.NameToLayer("Inventory Items");
-            //inst.GetComponent<Rigidbody>(). = false;
-
-
-            //Experimental
-            /*Material m = inst.GetComponent<Renderer>().material;
-            m.SetOverrideTag("RenderType", "Opaque");
-            m.SetFloat("_Mode", 3);
-            m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-            m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            m.SetInt("_ZWrite", 0);
-            m.DisableKeyword("_ALPHATEST_ON");
-            m.EnableKeyword("_ALPHABLEND_ON");
-            m.DisableKeyword("_APLHAPREMULTIPLY_ON");
-            m.renderQueue = 3000;
-            Color c = m.color;
-            c.a = 0.1f;
-            inst.GetComponent<Renderer>().material.color = c;*/
-
             inst.transform.position = slot.slot.transform.position;
-            inst.transform.localScale *= obj_scale / inst.GetComponent<Renderer>().bounds.size.magnitude;
+            inst.transform.localScale *= objScale / inst.GetComponent<Renderer>().bounds.size.magnitude;
             inst.tag = "InventoryItem";
 			slot.shown = inst;
 			shownToSlot.Add (inst, slot);
         }
+
         shown = true;
     }
 
@@ -117,8 +97,10 @@ public class Inventory : MonoBehaviour {
 	public GameObject TakeSlot(GameObject s)
 	{
 		var obj = objToSlot [s].shown;
-		if (!obj)
+
+        if (!obj)
 			return null;
+
 		return TakeObject (obj);
 	}
 
@@ -144,22 +126,16 @@ public class Inventory : MonoBehaviour {
 				slot.shown = null;
 			}
         }
+
         shown = false;
     }
-
-    void Start () {
-		// TODO initiallization goes here
-	}
 	
-	void Update () {
+	void Update ()
+    {
         if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
-        {
             ShowInventory();
-        }
 
         if(Controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
-        {
             HideInventory();
-        }
     }
 }

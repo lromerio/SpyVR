@@ -1,19 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ListenerTest : MonoBehaviour {
-    Light l;
+
+    private Light l;
+
     void Awake()
     {
         l = GetComponent<Light>();
     }
-    public void disable_me(VRButton button)
+
+    public void Trigger(VRButton button)
     {
         l.enabled = !l.enabled;
     }
 
-    public void set_intesity(VRLever lever, float value, float valuecache)
+    public void SetIntensity(VRLever lever, float value, float valuecache)
     {
         l.intensity = value;
     }
