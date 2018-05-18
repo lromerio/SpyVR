@@ -238,11 +238,12 @@ public class ControllerGrabObject : MonoBehaviour {
 			if (tangibleObject || inventorySlot)
                 GrabObject();
 
-			if (hoveredObject) { //Button and such			
+			if (hoveredObject)
+			{ 
+				//Button and such
 				ControllerTriggerable tr = hoveredObject.GetComponent<ControllerTriggerable>();
-				if (tr) {
+				if (tr)
 					tr.OnControllerTrigger ();
-				}
 			}
         }
 

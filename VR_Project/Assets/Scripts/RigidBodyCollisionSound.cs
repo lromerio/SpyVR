@@ -5,10 +5,15 @@ public class RigidBodyCollisionSound : MonoBehaviour {
     private AudioSource source;
     public float bounceVolume;
     public float soundThreshold;
+	public AudioClip sound;
 
-    void Start ()
-    {
-        source = GetComponent<AudioSource>();
+	// Use this for initialization
+	void Start ()
+	{
+		source = gameObject.AddComponent<AudioSource> ();
+		source.spatialBlend = 1f;
+		source.clip = sound;
+		source.playOnAwake = false;
 	}
 	
     void OnCollisionEnter(Collision collision)
