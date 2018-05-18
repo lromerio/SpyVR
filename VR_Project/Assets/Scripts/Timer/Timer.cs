@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Timer : MonoBehaviour {
 
-    private float remainingTime;
+    public float remainingTime;
     private bool gameOver;
     public float waitingTime;
 
