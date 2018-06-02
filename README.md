@@ -16,7 +16,7 @@ Obviously, in order to reach their goal, the two players have to collaborate and
 
 You can either open the project in [Unity](https://unity3d.com/) (version 2017.4.0f1 was used) and launch the scene called *Demo*. Note that, since we used some Blender models to build our scenario, you need to have [Blender](https://www.blender.org/) installed in order to correctly open the project.
 
-Alternatively you can download the standalone build [here](/application/).
+Alternatively you can download the standalone build [here](https://drive.google.com/file/d/19JBva9KtQJPJKN1XNaELOmQ69Fe1GvH2/view?usp=sharing).
 
 ## Commands
 ### Oracle Command line
