@@ -1,5 +1,7 @@
 # Spy VR
 
+![Top view](/img/top_view.jpg)
+
 ## Description
 An asymmetrical, escape room like, VR game done with Unity and SteamVR.
 Developed during two weeks in the context of the course _CS-444 Virtual Reality_ at École polytechinque fédérale de Lausanne (EPFL).
