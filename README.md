@@ -1,8 +1,8 @@
-# Asymmetrical VR escape room like game
+# Spy VR
 
 ## Description
 An asymmetrical, escape room like, VR game done with Unity and SteamVR.
-Developed in the context of the course _CS-444 Virtual Reality_ at École polytechinque fédérale de Lausanne (EPFL).
+Developed during two weeks in the context of the course _CS-444 Virtual Reality_ at École polytechinque fédérale de Lausanne (EPFL).
 
 The scenario of the game is a spy mission and it involves two players: the _VR player_ and the _Oracle player_.
 The first is inside the VR world (using an HTC vive) and acts as the spy.
