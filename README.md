@@ -10,6 +10,13 @@ The second - the so called _Oracle_ - act has the guy behind the scenes, which g
 The _Oracle_ sees the scene from the top and has a simple command line at his disposal.
 Obviously, in order to reach their goal, the two players have to collaborate and communicate.
 
+[Here](https://www.youtube.com/watch?v=DuQHT63kiMo&feature=youtu.be) you can find a short video demo of the project.
+
+## Getting Started
+
+You can either open the project in [Unity](https://unity3d.com/) (version 2017.4.0f1 was used) and launch the scene called *Demo*. Note that, since we used some Blender models to build our scenario, you need to have [Blender](https://www.blender.org/) installed in order to correctly open the project.
+
+Alternatively you can download the standalone build [here](/application/).
 
 ## Commands
 ### Oracle Command line
@@ -48,6 +55,9 @@ This is just a quick overview, for more details please refer - again - to the  [
 
 #### Success
 - The _VR player_ cut the correct cables: an hidden room appears
+
+## License
+MIT licensed, details in [LICENSE.md](/LICENSE.md)
 
 ## Authors
 - Collaud Jonathan - [JonathanCollaud](https://github.com/JonathanCollaud)
