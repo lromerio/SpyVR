@@ -8,7 +8,7 @@ Developed during two weeks in the context of the course _CS-444 Virtual Reality_
 
 The scenario of the game is a spy mission and it involves two players: the _VR player_ and the _Oracle player_.
 The first is inside the VR world (using an HTC vive) and acts as the spy.
-The second - the so called _Oracle_ - act has the guy behind the scenes, which guides the spy through his mission.
+The second - the so called _Oracle_ - acts behind the scenes and guides the spy through his mission.
 The _Oracle_ sees the scene from the top and has a simple command line at his disposal.
 Obviously, in order to reach their goal, the two players have to collaborate and communicate.
 
@@ -37,11 +37,11 @@ This is just a quick overview, for more details please refer - again - to the  [
 #### Main Objects
 - A computer
 - A printer
-- A Key
+- A key
 - Alarm cables
 
 #### _VR player_ tasks
-- Find the computer ID and communicate it to the _Oracle player_.
+- Find the computer ID and communicate it to the _Oracle player_
 - Find the key
 - Find the alarm cables and use the key to open the "cable box"
 - Cut the correct cables in order to deactivate the alarm
@@ -49,14 +49,14 @@ This is just a quick overview, for more details please refer - again - to the  [
 #### _Oracle player_ tasks
 - Hack the computer, this will result in the printer printing the light specifications
 - Turn off the lights, so that the hidden message is shown
-- Communicate to the _VR player_ which cable to cut (based on the hidden message)
+- Communicate to the _VR player_ which cables to cut (based on the hidden message)
 
 #### Failure
-- The _VR player_ cuts the wrong cable
+- The _VR player_ cuts a wrong cable
 - The timer counts down to zero
 
 #### Success
-- The _VR player_ cut the correct cables: an hidden room appears
+- The _VR player_ cuts the correct cables: an hidden room appears
 
 ## License
 MIT licensed, details in [LICENSE.md](/LICENSE.md)
